@@ -22,6 +22,11 @@ using Octokit;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers.Projectiles;
+using HarmonyLib;
+using Il2CppAssets.Scripts.Simulation.Bloons;
+using BTD_Mod_Helper;
+using UnityEngine;
+using MelonLoader;
 
 
 public class BonnieHero : ModHero
@@ -29,6 +34,7 @@ public class BonnieHero : ModHero
     public override string BaseTower => TowerType.SpikeFactory;
     public override int Cost => 900;
     public override string DisplayName => "Bonnie";
+    public override string Name => "BonnieHero";
     public override string Title => "Bloonstone Miner";
     public override string Description => "A hard working miner who summons carts of Bloonstones for extra cash. Her dynamite makes short work of any Bloon that passes by.";
     public override string Level1Description => "A hard working miner who summons carts of Bloonstones for extra cash. Her dynamite makes short work of any Bloon that passes by.";
@@ -47,8 +53,8 @@ public class BonnieHero : ModHero
         var gwen = Game.instance.model.GetTowerWithName(TowerType.Gwendolin);
         var attackModel = towerModel.GetAttackModel();
         var projectile = attackModel.weapons[0].projectile;
-        var explosion = Game.instance.model.GetTowerFromId("BombShooter").GetWeapon().projectile.GetBehavior<CreateProjectileOnContactModel>().Duplicate();
-        var explosionEffect = Game.instance.model.GetTowerFromId("SpikeFactory-400").GetWeapon().projectile.GetBehavior<CreateEffectOnExhaustFractionModel>().Duplicate();
+        var explosion = Game.instance.model.GetTowerFromId("MortarMonkey").GetWeapon().projectile.GetBehavior<CreateProjectileOnExhaustFractionModel>().Duplicate();
+        //var explosionEffect = Game.instance.model.GetTowerFromId("MortarMonkey").GetWeapon().projectile.GetBehavior<CreateEffectOnExhaustFractionModel>().Duplicate();
 
         towerModel.mods = quincy.mods;
         towerModel.display = gwen.display;
@@ -56,13 +62,16 @@ public class BonnieHero : ModHero
         towerModel.radius = quincy.radius;
         towerModel.doesntRotate = false;
 
+
         attackModel.range = quincy.range;
         attackModel.weapons[0].rate = 2.5f;
 
         projectile.GetDamageModel().damage = 1;
         projectile.pierce = 1.0f;
+        projectile.maxPierce = 1.0f;
         projectile.AddBehavior(explosion);
-        projectile.AddBehavior(explosionEffect);
+
+        //projectile.AddBehavior(explosionEffect);
     }
 
     public class BloonstoneCart : ModBloon
@@ -75,9 +84,37 @@ public class BonnieHero : ModHero
             bloonModel.leakDamage = 0;
             bloonModel.maxHealth = 5;
             //bloonModel.GetBehavior<DistributeCashModel>().cash = 50;
-            //bloonModel.GetBehavior<CarryProjectileModel>().projectile = farm.GetWeapon().projectile;
+            //bloonModel.GetBehavior<CarryProjectileModel>().projectile = farm.GetWeapon().projectile.Duplicate();
         }
     }
+
+    /*[HarmonyPatch(typeof(Il2CppAssets.Scripts.Simulation.Towers.Tower), nameof(Il2CppAssets.Scripts.Simulation.Towers.Tower.OnPlace))]
+    public static class BonniePlaced
+    {
+        [HarmonyPostfix]
+        public static void Postfix(Il2CppAssets.Scripts.Simulation.Towers.Tower tower)
+        {
+            if (tower != null)
+            {
+                if (tower.towerModel.baseId == "BonnieHero")
+                {
+                    MelonLogger.Msg("Bonnie Hero Placed");
+                }
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Il2CppAssets.Scripts.Simulation.Bloons.Bloon), nameof(Il2CppAssets.Scripts.Simulation.Bloons.Bloon.Degrade))]
+    internal static class CartDropCash
+    {
+        [HarmonyPostfix]
+        internal static void Postfix(Bloon __instance)
+        {
+            //var proj = Game.instance.model.GetTowerWithName(TowerType.BananaFarm).GetWeapon().projectile.Duplicate();
+
+            
+        }
+    }*/
 
     public class Levels
     {

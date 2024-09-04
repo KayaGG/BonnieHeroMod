@@ -27,6 +27,9 @@ using Il2CppAssets.Scripts.Simulation.Bloons;
 using BTD_Mod_Helper;
 using UnityEngine;
 using MelonLoader;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppAssets.Scripts.Models;
+using System.Linq;
 
 
 public class BonnieHero : ModHero
@@ -53,13 +56,15 @@ public class BonnieHero : ModHero
         var gwen = Game.instance.model.GetTowerWithName(TowerType.Gwendolin);
         var attackModel = towerModel.GetAttackModel();
         var projectile = attackModel.weapons[0].projectile;
-        var explosion = Game.instance.model.GetTowerFromId("MortarMonkey").GetWeapon().projectile.GetBehavior<CreateProjectileOnExhaustFractionModel>().Duplicate();
-        //var explosionEffect = Game.instance.model.GetTowerFromId("MortarMonkey").GetWeapon().projectile.GetBehavior<CreateEffectOnExhaustFractionModel>().Duplicate();
+        var explosion = Game.instance.model.GetTower("BombShooter").GetWeapon().projectile.GetBehavior<
+                    CreateProjectileOnContactModel>().Duplicate();
+
 
         towerModel.mods = quincy.mods;
         towerModel.display = gwen.display;
         towerModel.footprint = quincy.footprint.Duplicate();
         towerModel.radius = quincy.radius;
+        towerModel.range = quincy.range;
         towerModel.doesntRotate = false;
 
 
@@ -71,13 +76,20 @@ public class BonnieHero : ModHero
         projectile.maxPierce = 1.0f;
         projectile.AddBehavior(explosion);
 
-        //projectile.AddBehavior(explosionEffect);
+        explosion.projectile.radius = 30f;
+
+        projectile.AddBehavior(Game.instance.model.GetTower("MortarMonkey").GetWeapon().projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>().Duplicate());
+        var effectOnExpire = projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>();
+        var effectOnExhaust = new CreateEffectOnExhaustedModel("CreateEffectOnExhaustedModel_", effectOnExpire.assetId,
+            effectOnExpire.lifespan, effectOnExpire.fullscreen, effectOnExpire.randomRotation,
+            effectOnExpire.effectModel);
+        projectile.AddBehavior(effectOnExhaust);
     }
 
     public class BloonstoneCart : ModBloon
     {
         public override string BaseBloon => BloonType.Red;
-
+        public override string Name => "BloonstoneCart";
         public override void ModifyBaseBloonModel(BloonModel bloonModel)
         {
             var farm = Game.instance.model.GetTowerWithName(TowerType.BananaFarm);
@@ -124,10 +136,17 @@ public class BonnieHero : ModHero
             public override int Level => 2;
             public override void ApplyUpgrade(TowerModel towerModel)
             {
-                
 
-                //towerModel.RemoveBehaviors<NecromancerZoneModel>();
-                var summon = Game.instance.model.GetTowerFromId("WizardMonkey-004").GetAttackModel(2).Duplicate();
+
+                /*var spawnCarts = new SpawnBloonsActionModel("SpawnBloonsActionModel_", "SpawnCarts", "BloonstoneCart", 1, 6, -999999, 0, 0, new Il2CppStringArray(new string[] { "BloonariusAttackSpew" }), new Il2CppStringArray(new string[] { "BloonariusAttackSpewMoab" }), 0, false, "Bonnie");
+
+                towerModel.AddBehavior(spawnCarts);*/
+
+
+                //towerModel.AddBehavior<>(spawnCarts);
+
+                //towerModel.RemoveBehaviors<NecromancerZoneModel;
+                /*var summon = Game.instance.model.GetTowerFromId("WizardMonkey-004").GetAttackModel(2).Duplicate();
                 var agemodel = Game.instance.model.GetTowerFromId("SpikeFactory").GetAttackModel().weapons[0].projectile.GetBehavior<AgeModel>().Duplicate();
 
                 summon.weapons[0].projectile.name = "AttackModel_Summon3_";
@@ -148,187 +167,188 @@ public class BonnieHero : ModHero
 
                 summon.weapons[0].projectile.AddBehavior(agemodel);
 
-                towerModel.AddBehavior(summon);
+                towerModel.AddBehavior(summon);*/
             }
+            //public override void On
+        }
 
-            public class Level3 : ModHeroLevel<BonnieHero>
+        public class Level3 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 3;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 3;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
                     
-                }
             }
+        }
 
-            public class Level4 : ModHeroLevel<BonnieHero>
+        public class Level4 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 4;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 4;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level5 : ModHeroLevel<BonnieHero>
+        public class Level5 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 5;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 5;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level6 : ModHeroLevel<BonnieHero>
+        public class Level6 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 6;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 6;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level7 : ModHeroLevel<BonnieHero>
+        public class Level7 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 7;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 7;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level8 : ModHeroLevel<BonnieHero>
+        public class Level8 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 8;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 8;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level9 : ModHeroLevel<BonnieHero>
+        public class Level9 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 9;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 9;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level10 : ModHeroLevel<BonnieHero>
+        public class Level10 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 10;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 10;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level11 : ModHeroLevel<BonnieHero>
+        public class Level11 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 11;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 11;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level12 : ModHeroLevel<BonnieHero>
+        public class Level12 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 12;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 12;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level13 : ModHeroLevel<BonnieHero>
+        public class Level13 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 13;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 13;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level14 : ModHeroLevel<BonnieHero>
+        public class Level14 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 14;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 14;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level15 : ModHeroLevel<BonnieHero>
+        public class Level15 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 15;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 15;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level16 : ModHeroLevel<BonnieHero>
+        public class Level16 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 16;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 16;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level17 : ModHeroLevel<BonnieHero>
+        public class Level17 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 17;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 17;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level18 : ModHeroLevel<BonnieHero>
+        public class Level18 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 18;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 18;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level19 : ModHeroLevel<BonnieHero>
+        public class Level19 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 19;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 19;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
+        }
 
-            public class Level20 : ModHeroLevel<BonnieHero>
+        public class Level20 : ModHeroLevel<BonnieHero>
+        {
+            public override string Description => "Description";
+            public override int Level => 20;
+            public override void ApplyUpgrade(TowerModel towerModel)
             {
-                public override string Description => "Description";
-                public override int Level => 20;
-                public override void ApplyUpgrade(TowerModel towerModel)
-                {
 
-                }
             }
         }
     }

@@ -25,17 +25,14 @@ public class BonnieHeroMod : BloonsTD6Mod
         }
     }
 
-    /*public override void OnTowerUpgraded(Tower tower, string upgradeName, TowerModel newBaseTowerModel)
+    public override void OnTowerUpgraded(Tower tower, string upgradeName, TowerModel newBaseTowerModel)
     {
         base.OnTowerUpgraded(tower, upgradeName, newBaseTowerModel);
         MelonLogger.Msg(tower.parentTowerId);
         MelonLogger.Msg(tower.model.name + " upgraded to " + upgradeName);
         if (upgradeName == "BonnieHeroMod-BonnieHero 2")
         {
-            MelonLogger.Msg("HOLY FUCK FIRING");
-            //tower.AddTowerBehavior<Il2CppAssets.Scripts.Simulation.Bloons.Behaviors.SpawnBloonsAction>();
-            
+            MelonLogger.Msg("HOLY FUCK FIRING");            
         }
-    }*/
-
+    }
 }

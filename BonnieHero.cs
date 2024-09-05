@@ -1,36 +1,10 @@
 using BTD_Mod_Helper.Api.Towers;
 using BTD_Mod_Helper.Extensions;
-using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Models.Towers;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors.Emissions;
-using Il2CppAssets.Scripts.Models.Towers.TowerFilters;
-using JetBrains.Annotations;
-using BTD_Mod_Helper.Api.Display;
-using Il2CppAssets.Scripts.Unity.Display;
-using Microsoft.VisualBasic;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
-using Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Behaviors;
-using Il2CppAssets.Scripts.Models.Towers.Weapons;
-using Il2CppAssets.Scripts.Unity.Towers.Projectiles.Behaviors;
-using BTD_Mod_Helper.Api.Bloons;
-using BTD_Mod_Helper.Api.Enums;
-using Il2CppAssets.Scripts.Models.Bloons;
-using Il2CppAssets.Scripts.Simulation.Bloons.Behaviors;
-using Il2Cpp;
-using Octokit;
-using Il2CppAssets.Scripts.Unity.UI_New.InGame;
-using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
-using Il2CppAssets.Scripts.Simulation.Towers.Projectiles;
-using HarmonyLib;
-using Il2CppAssets.Scripts.Simulation.Bloons;
-using BTD_Mod_Helper;
-using UnityEngine;
-using MelonLoader;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppAssets.Scripts.Models;
-using System.Linq;
+using Il2CppAssets.Scripts.Unity;
 
+namespace BonnieHeroMod;
 
 public class BonnieHero : ModHero
 {
@@ -57,7 +31,7 @@ public class BonnieHero : ModHero
         var attackModel = towerModel.GetAttackModel();
         var projectile = attackModel.weapons[0].projectile;
         var explosion = Game.instance.model.GetTower("BombShooter").GetWeapon().projectile.GetBehavior<
-                    CreateProjectileOnContactModel>().Duplicate();
+            CreateProjectileOnContactModel>().Duplicate();
 
 
         towerModel.mods = quincy.mods;
@@ -84,49 +58,9 @@ public class BonnieHero : ModHero
             effectOnExpire.lifespan, effectOnExpire.fullscreen, effectOnExpire.randomRotation,
             effectOnExpire.effectModel);
         projectile.AddBehavior(effectOnExhaust);
+
+
     }
-
-    public class BloonstoneCart : ModBloon
-    {
-        public override string BaseBloon => BloonType.Red;
-        public override string Name => "BloonstoneCart";
-        public override void ModifyBaseBloonModel(BloonModel bloonModel)
-        {
-            var farm = Game.instance.model.GetTowerWithName(TowerType.BananaFarm);
-            bloonModel.leakDamage = 0;
-            bloonModel.maxHealth = 5;
-            //bloonModel.GetBehavior<DistributeCashModel>().cash = 50;
-            //bloonModel.GetBehavior<CarryProjectileModel>().projectile = farm.GetWeapon().projectile.Duplicate();
-        }
-    }
-
-    /*[HarmonyPatch(typeof(Il2CppAssets.Scripts.Simulation.Towers.Tower), nameof(Il2CppAssets.Scripts.Simulation.Towers.Tower.OnPlace))]
-    public static class BonniePlaced
-    {
-        [HarmonyPostfix]
-        public static void Postfix(Il2CppAssets.Scripts.Simulation.Towers.Tower tower)
-        {
-            if (tower != null)
-            {
-                if (tower.towerModel.baseId == "BonnieHero")
-                {
-                    MelonLogger.Msg("Bonnie Hero Placed");
-                }
-            }
-        }
-    }
-
-    [HarmonyPatch(typeof(Il2CppAssets.Scripts.Simulation.Bloons.Bloon), nameof(Il2CppAssets.Scripts.Simulation.Bloons.Bloon.Degrade))]
-    internal static class CartDropCash
-    {
-        [HarmonyPostfix]
-        internal static void Postfix(Bloon __instance)
-        {
-            //var proj = Game.instance.model.GetTowerWithName(TowerType.BananaFarm).GetWeapon().projectile.Duplicate();
-
-            
-        }
-    }*/
 
     public class Levels
     {
@@ -141,27 +75,27 @@ public class BonnieHero : ModHero
 
                 //towerModel.RemoveBehaviors<NecromancerZoneModel;
                 /*var summon = Game.instance.model.GetTowerFromId("WizardMonkey-004").GetAttackModel(2).Duplicate();
-                var agemodel = Game.instance.model.GetTowerFromId("SpikeFactory").GetAttackModel().weapons[0].projectile.GetBehavior<AgeModel>().Duplicate();
+            var agemodel = Game.instance.model.GetTowerFromId("SpikeFactory").GetAttackModel().weapons[0].projectile.GetBehavior<AgeModel>().Duplicate();
 
-                summon.weapons[0].projectile.name = "AttackModel_Summon3_";
-                summon.weapons[0].emission = new NecromancerEmissionModel("CartDeploy_", 1, 1, 1, 1, 1, 1, 0, null, null, null, 1, 1, 1, 1, 2);
-                summon.weapons[0].rate = 6f;
-                summon.weapons[0].projectile.GetBehavior<TravelAlongPathModel>().disableRotateWithPathDirection = false;
-                summon.name = "AttackModel_Summon_";
-                summon.weapons[0].projectile.GetDamageModel().damage = 1;
-                summon.weapons[0].projectile.pierce = 999999f;
-                summon.range = 999999;
-                summon.weapons[0].projectile.GetBehavior<TravelAlongPathModel>().lifespanFrames = 0;
-                summon.weapons[0].projectile.GetBehavior<TravelAlongPathModel>().lifespan = 999999f;
+            summon.weapons[0].projectile.name = "AttackModel_Summon3_";
+            summon.weapons[0].emission = new NecromancerEmissionModel("CartDeploy_", 1, 1, 1, 1, 1, 1, 0, null, null, null, 1, 1, 1, 1, 2);
+            summon.weapons[0].rate = 6f;
+            summon.weapons[0].projectile.GetBehavior<TravelAlongPathModel>().disableRotateWithPathDirection = false;
+            summon.name = "AttackModel_Summon_";
+            summon.weapons[0].projectile.GetDamageModel().damage = 1;
+            summon.weapons[0].projectile.pierce = 999999f;
+            summon.range = 999999;
+            summon.weapons[0].projectile.GetBehavior<TravelAlongPathModel>().lifespanFrames = 0;
+            summon.weapons[0].projectile.GetBehavior<TravelAlongPathModel>().lifespan = 999999f;
 
 
-                agemodel.lifespanFrames = 0;
-                agemodel.lifespan = 999999f;
-                agemodel.rounds = 9999;
+            agemodel.lifespanFrames = 0;
+            agemodel.lifespan = 999999f;
+            agemodel.rounds = 9999;
 
-                summon.weapons[0].projectile.AddBehavior(agemodel);
+            summon.weapons[0].projectile.AddBehavior(agemodel);
 
-                towerModel.AddBehavior(summon);*/
+            towerModel.AddBehavior(summon);*/
             }
             //public override void On
         }

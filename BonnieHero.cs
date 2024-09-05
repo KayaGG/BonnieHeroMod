@@ -1,6 +1,7 @@
 using BTD_Mod_Helper.Api.Towers;
 using BTD_Mod_Helper.Extensions;
 using Il2CppAssets.Scripts.Models.Towers;
+using Il2CppAssets.Scripts.Models.Towers.Behaviors.Attack.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Unity;
 
@@ -30,9 +31,9 @@ public class BonnieHero : ModHero
         var gwen = Game.instance.model.GetTowerWithName(TowerType.Gwendolin);
         var attackModel = towerModel.GetAttackModel();
         var projectile = attackModel.weapons[0].projectile;
+        var caltropsBehavior = Game.instance.model.GetTowerFromId("NinjaMonkey-002").GetAttackModel(1).GetBehavior<RotateToTargetModel>().Duplicate();
         var explosion = Game.instance.model.GetTower("BombShooter").GetWeapon().projectile.GetBehavior<
             CreateProjectileOnContactModel>().Duplicate();
-
 
         towerModel.mods = quincy.mods;
         towerModel.display = gwen.display;
@@ -41,9 +42,9 @@ public class BonnieHero : ModHero
         towerModel.range = quincy.range;
         towerModel.doesntRotate = false;
 
-
         attackModel.range = quincy.range;
         attackModel.weapons[0].rate = 2.5f;
+        attackModel.AddBehavior(caltropsBehavior);
 
         projectile.GetDamageModel().damage = 1;
         projectile.pierce = 1.0f;
@@ -58,8 +59,6 @@ public class BonnieHero : ModHero
             effectOnExpire.lifespan, effectOnExpire.fullscreen, effectOnExpire.randomRotation,
             effectOnExpire.effectModel);
         projectile.AddBehavior(effectOnExhaust);
-
-
     }
 
     public class Levels

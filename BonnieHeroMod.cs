@@ -24,15 +24,13 @@ public class BonnieHeroMod : BloonsTD6Mod
             MelonLogger.Msg(tower.model.name + " above level 1, patching in behaviors");
         }
     }
-
     public override void OnTowerUpgraded(Tower tower, string upgradeName, TowerModel newBaseTowerModel)
     {
         base.OnTowerUpgraded(tower, upgradeName, newBaseTowerModel);
-        MelonLogger.Msg(tower.parentTowerId);
         MelonLogger.Msg(tower.model.name + " upgraded to " + upgradeName);
         if (upgradeName == "BonnieHeroMod-BonnieHero 2")
         {
-            MelonLogger.Msg("HOLY FUCK FIRING");            
+            MelonLogger.Msg("HOLY FUCK FIRING 2");            
         }
     }
 }

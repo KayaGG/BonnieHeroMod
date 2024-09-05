@@ -135,7 +135,10 @@ public class BonnieHero : ModHero
             public override string Description => "Harmless minecarts appear on the natural bloon track which can be \"popped\" for cash. Upgrade them to make them more valuable, to a maximum of $300 per cart.";
             public override int Level => 2;
             public override void ApplyUpgrade(TowerModel towerModel)
-            { 
+            {
+
+
+
                 //towerModel.RemoveBehaviors<NecromancerZoneModel;
                 /*var summon = Game.instance.model.GetTowerFromId("WizardMonkey-004").GetAttackModel(2).Duplicate();
                 var agemodel = Game.instance.model.GetTowerFromId("SpikeFactory").GetAttackModel().weapons[0].projectile.GetBehavior<AgeModel>().Duplicate();

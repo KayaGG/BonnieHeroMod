@@ -10,6 +10,9 @@
         <DebugType>embedded</DebugType>
     </PropertyGroup>
     <ItemGroup>
+      <None Remove="BonnieHeroMod.zip" />
+    </ItemGroup>
+    <ItemGroup>
         <Content Include=".github\workflows\build.yml" />
     </ItemGroup>
 

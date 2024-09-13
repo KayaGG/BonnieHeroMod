@@ -17,6 +17,9 @@ using Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Simulation.SMath;
 using UnityEngine;
 using Il2CppAssets.Scripts.Simulation.Towers;
+using Il2CppAssets.Scripts.Simulation.Track.RoundManagers;
+using Il2CppAssets.Scripts.Utils;
+using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 
 namespace BonnieHeroMod;
 
@@ -28,8 +31,10 @@ public class BloonstoneCart : ModBloon
     public override void ModifyBaseBloonModel(BloonModel bloonModel)
     {
         //var farm = Game.instance.model.GetTowerWithName(TowerType.BananaFarm);
+        bloonModel.display = Game.instance.model.bloonsByName["Golden"].display;
+
         bloonModel.leakDamage = 0;
-        bloonModel.maxHealth = 5;
+        bloonModel.maxHealth = 4;
         //bloonModel.GetBehavior<DistributeCashModel>().cash = 50;
         //bloonModel.GetBehavior<CarryProjectileModel>().projectile = farm.GetWeapon().projectile.Duplicate();
     }
@@ -38,7 +43,7 @@ public class BloonstoneCart : ModBloon
     [HarmonyPostfix]
     private static void Bloon_Degrade(Bloon bloon)
     {
-        MelonLogger.Msg("test");
+        MelonLogger.Msg("bloon degrade");
         if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
         {
             var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
@@ -57,12 +62,13 @@ public class BloonstoneCart : ModBloon
             var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Projectile, ProjectileModel>(
                 cashProjectile);
             var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
-            const uint dropRange = 100;
+            const uint dropRange = 20;
             arriveAtTarget.SetStartPosition(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X,
                 bloon.Position.Y, 100));
 
-            arriveAtTarget.targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X + Random.Range(-dropRange, dropRange),
+            var targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X + Random.Range(-dropRange, dropRange),
                 bloon.Position.Y + Random.Range(-dropRange, dropRange), 100);
+            arriveAtTarget.targetPos = targetPos;
 
             projectile.Position.X = bloon.Position.X;
             projectile.Position.Y = bloon.Position.Y;
@@ -72,8 +78,7 @@ public class BloonstoneCart : ModBloon
             projectile.direction.Y = 0;
             projectile.direction.Z = 0;
             projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
-            projectile.target = new Target(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X,
-                bloon.Position.Y, 100));
+            projectile.target = new Target(targetPos);
 
             projectile.emittedFrom = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X,
                 bloon.Position.Y, 100);
@@ -85,4 +90,19 @@ public class BloonstoneCart : ModBloon
             MelonLogger.Msg("projectile spawned");
         }
     }
+
+    [HarmonyPatch(typeof(InGame), nameof(InGame.RoundStart))]
+    [HarmonyPostfix]
+    private static void SpawnCarts()
+    {
+        var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+        if (bonnieHero != null)
+        {
+            if (bonnieHero.towerModel.tier > 1)
+            {
+                InGame.instance.SpawnBloons(ModContent.BloonID<BloonstoneCart>(), 3, 360);
+            }
+        }
+    }
+
 }

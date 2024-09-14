@@ -22,6 +22,7 @@ using Il2CppAssets.Scripts.Unity.Display;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Mods;
+using UnityEngine.UI;
 
 namespace BonnieHeroMod;
 
@@ -98,7 +99,7 @@ public class BonnieHero : ModHero
                 //depoModel.depositPercent = 20f;
 
                 bankModel.autoCollect = false;
-                bankModel.capacity = 240f * 5f;
+                bankModel.capacity = 999999f;
                 bankModel.interest = 0f;
                 towerModel.AddBehavior(bankModel);
                 towerModel.AddBehavior(depoModel);
@@ -331,9 +332,28 @@ public class BonnieHero : ModHero
     {
         if (__instance.tower.namedMonkeyKey == "Bonnie")
         {
-            //__instance.tower.modelBehaviors.
-            var upgradePrice = 240f;
-            __result = upgradePrice;
+            
+            var bank = __instance.tower.GetTowerBehavior<Bank>();
+
+            //MelonLogger.Msg("bank.cash " + bank.cash);
+
+            if (bank.cash != bank.bankModel.capacity)
+            {
+                __instance.tower.necroBloonsReanimated = 5;
+                var upgradePrice = 1f;
+                switch (__instance.tower.necroBloonsReanimated)
+                {
+                    case < 5:
+                        upgradePrice = 240f;
+                        __result = upgradePrice;
+                        break;
+                    case < 10:
+                        upgradePrice = 1000f;
+                        __result = upgradePrice;
+                        break;
+                }
+                //__instance.tower.necroBloonsReanimated += 1;
+            }
         }
     }
 

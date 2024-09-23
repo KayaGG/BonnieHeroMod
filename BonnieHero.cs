@@ -23,6 +23,13 @@ using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Mods;
 using UnityEngine.UI;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu.TowerSelectionMenuThemes;
+using Il2CppAssets.Scripts.Unity.Bridge;
+using static MelonLoader.MelonLogger;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
+using static BonnieHeroMod.BonnieHeroMod;
+using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
+using Il2CppAssets.Scripts.Models;
 
 namespace BonnieHeroMod;
 
@@ -85,6 +92,23 @@ public class BonnieHero : ModHero
         projectile.AddBehavior(effectOnExhaust);
     }
 
+    [HarmonyPatch(typeof(RangeSupport.MutatorTower), nameof(RangeSupport.MutatorTower.Mutate))]
+    internal static class RangeSupport_MutatorTower_Mutate
+    {
+        [HarmonyPrefix]
+        private static bool Prefix(RangeSupport.MutatorTower __instance, Model model, ref bool __result)
+        {
+            
+            if (__instance.id == "MinecartTier")
+            {
+                __result = true;
+                return false;
+            }
+
+            return true;
+        }
+    }
+
     public class Levels
     {
         public class Level2 : ModHeroLevel<BonnieHero>
@@ -104,7 +128,7 @@ public class BonnieHero : ModHero
                 towerModel.AddBehavior(bankModel);
                 towerModel.AddBehavior(depoModel);
 
-                towerModel.towerSelectionMenuThemeId = "BananaFarmDeposit";
+                //towerModel.towerSelectionMenuThemeId = "BananaFarmDeposit";
             }
         }
 
@@ -139,7 +163,7 @@ public class BonnieHero : ModHero
             public override int Level => 5;
             public override void ApplyUpgrade(TowerModel towerModel)
             {
-    
+                
             }
         }
 
@@ -326,20 +350,18 @@ public class BonnieHero : ModHero
         }
     }
 
-    [HarmonyPatch(typeof(BankDeposits), nameof(BankDeposits.GetDepositAmount))]
+    /*[HarmonyPatch(typeof(BankDeposits), nameof(BankDeposits.GetDepositAmount))]
     [HarmonyPostfix]
     public static void DepositPostfix(BankDeposits __instance, ref float __result)
     {
         if (__instance.tower.namedMonkeyKey == "Bonnie")
         {
-            
             var bank = __instance.tower.GetTowerBehavior<Bank>();
 
             //MelonLogger.Msg("bank.cash " + bank.cash);
 
             if (bank.cash != bank.bankModel.capacity)
             {
-                __instance.tower.necroBloonsReanimated = 5;
                 var upgradePrice = 1f;
                 switch (__instance.tower.necroBloonsReanimated)
                 {
@@ -351,11 +373,91 @@ public class BonnieHero : ModHero
                         upgradePrice = 1000f;
                         __result = upgradePrice;
                         break;
+                    case < 15:
+                        upgradePrice = 2700f;
+                        __result = upgradePrice;
+                        break;
+                    case < 20:
+                        upgradePrice = 4800f;
+                        __result = upgradePrice;
+                        break;
+                    case < 25:
+                        upgradePrice = 8800f;
+                        __result = upgradePrice;
+                        break;
+                    case < 30:
+                        upgradePrice = 13000f;
+                        __result = upgradePrice;
+                        break;
+                    case < 35:
+                        upgradePrice = 21000f;
+                        __result = upgradePrice;
+                        break;
+                    case < 40:
+                        upgradePrice = 29000f;
+                        __result = upgradePrice;
+                        break;
+
+                    //281890
                 }
                 //__instance.tower.necroBloonsReanimated += 1;
             }
         }
-    }
+    }*/
+
+    /*[HarmonyPatch(typeof(TSMThemeBananaFarm), nameof(TSMThemeBananaFarm.OnButtonPress))]
+    [HarmonyPostfix]
+    public static void Postfix(TowerToSimulation tower, TSMButton button)
+    {
+        if (tower.namedMonkeyKey == "Bonnie")
+        {
+            if (button.name == "BankDepositBtn")
+            {
+                tower.tower.necroBloonsReanimated += 1;
+                var bonnieHero = tower.tower;
+                var cashProjectile;
+                switch (tower.tower.necroBloonsReanimated)
+                {
+                    case <= 5:
+                        cashProjectile.GetBehavior<CashModel>().minimum += bonnieHero.necroBloonsReanimated * 10;
+                        cashProjectile.GetBehavior<CashModel>().maximum += bonnieHero.necroBloonsReanimated * 10;
+                        break;
+                    case <= 10:
+                        cashProjectile.GetBehavior<CashModel>().minimum = 40;
+                        cashProjectile.GetBehavior<CashModel>().maximum = 40;
+                        break;
+                    case <= 15:
+                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        break;
+                    case <= 20:
+                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        break;
+                    case <= 25:
+                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        break;
+                    case <= 30:
+                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        break;
+                    case <= 35:
+                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        break;
+                    case <= 40:
+                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
+                        break;
+                }
+            }
+            if (button.name == "BankCollectBtn")
+            {
+                tower.tower.necroBloonsReanimated = 0;
+            }
+        }
+    }*/
 
     /*[HarmonyPatch(typeof(Bank), nameof(Bank.Collect))]
     [HarmonyPostfix]

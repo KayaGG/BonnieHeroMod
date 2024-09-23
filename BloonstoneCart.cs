@@ -20,6 +20,7 @@ using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Simulation.Track.RoundManagers;
 using Il2CppAssets.Scripts.Utils;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
+using static MelonLoader.MelonLogger;
 
 namespace BonnieHeroMod;
 
@@ -39,6 +40,11 @@ public class BloonstoneCart : ModBloon
         //bloonModel.GetBehavior<CarryProjectileModel>().projectile = farm.GetWeapon().projectile.Duplicate();
     }
 
+    public static class CartLogic
+    {
+
+    }
+
     [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonDegrade))]
     [HarmonyPostfix]
     private static void Bloon_Degrade(Bloon bloon)
@@ -55,9 +61,6 @@ public class BloonstoneCart : ModBloon
 
             var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile.Duplicate();
             cashProjectile.RemoveBehavior<AgeModel>();
-
-            cashProjectile.GetBehavior<CashModel>().minimum = 50;
-            cashProjectile.GetBehavior<CashModel>().maximum = 50;
 
             var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Projectile, ProjectileModel>(
                 cashProjectile);
@@ -98,7 +101,7 @@ public class BloonstoneCart : ModBloon
         var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
         if (bonnieHero != null)
         {
-            if (bonnieHero.towerModel.tier > 1)
+            if (bonnieHero.towerModel.tier > 0)
             {
                 InGame.instance.SpawnBloons(ModContent.BloonID<BloonstoneCart>(), 3, 360);
             }

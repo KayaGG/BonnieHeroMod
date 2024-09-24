@@ -33,36 +33,41 @@ namespace BonnieHeroMod
 
             public static void Init(TowerSelectionMenu tsm)
             {
-                if (bonniePanel == null)
+                if (TowerSelectionMenu.instance.selectedTower != null)
                 {
-                    BTD_Mod_Helper.Api.TaskScheduler.ScheduleTask(() =>
+                    if (TowerSelectionMenu.instance.selectedTower.tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
                     {
-                        MelonLogger.Msg("BonnieUI Init");
-                        menu = tsm;
-
-                        bonniePanel = TowerSelectionMenu.instance.themeManager.currentTheme.gameObject.AddModHelperPanel(new Info("BonniePanel", InfoPreset.FillParent));
-
-                        cartTier = bonniePanel.AddText(new Info("CartLevel", 250, -75, 270, 135), "Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier);
-
-                        cartUpgrade = bonniePanel.AddButton(new Info("CartUpgrade", -225, -580, 270, 135), VanillaSprites.GreenBtnLong,
-                            new System.Action(() =>
+                        if (bonniePanel == null)
+                        {
+                            BTD_Mod_Helper.Api.TaskScheduler.ScheduleTask(() =>
                             {
-                                CartUpgradeLogic();
-                            }));
-                        upgradeText = cartUpgrade.AddText(new Info("CartUpgradeText", 0, 0, 270, 135), "Upgrade (" + 240 + ")");
+                                MelonLogger.Msg("BonnieUI Init");
+                                menu = tsm;
 
-                        //cartUpgradeText = bonniePanel.AddText(new Info("CartUpgradeText", -225, -580, 270, 135), "Upgrade");
+                                bonniePanel = TowerSelectionMenu.instance.themeManager.currentTheme.gameObject.AddModHelperPanel(new Info("BonniePanel", InfoPreset.FillParent));
 
-                        cartSell = bonniePanel.AddButton(new Info("CartSell", 225, -580, 270, 135), VanillaSprites.RedBtnLong,
-                            new System.Action(() =>
-                            {
-                                CartSellLogic();
-                            }));
-                        sellText = cartSell.AddText(new Info("CartSellText", 0, 0, 270, 135), "Sell (" + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().additive + ")", 40);
+                                cartTier = bonniePanel.AddText(new Info("CartLevel", 250, -75, 270, 135), "Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier);
 
-                        menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().glueLevel = 10; //this shit is the fucking max tier oh my god
+                                cartUpgrade = bonniePanel.AddButton(new Info("CartUpgrade", -225, -580, 270, 135), VanillaSprites.GreenBtnLong,
+                                    new System.Action(() =>
+                                    {
+                                        CartUpgradeLogic();
+                                    }));
+                                upgradeText = cartUpgrade.AddText(new Info("CartUpgradeText", 0, 0, 270, 135), "Upgrade (" + 240 + ")");
 
-                    }, () => TowerSelectionMenu.instance.themeManager.currentTheme != null);
+                                //cartUpgradeText = bonniePanel.AddText(new Info("CartUpgradeText", -225, -580, 270, 135), "Upgrade");
+
+                                cartSell = bonniePanel.AddButton(new Info("CartSell", 225, -580, 270, 135), VanillaSprites.RedBtnLong,
+                                    new System.Action(() =>
+                                    {
+                                        CartSellLogic();
+                                    }));
+                                sellText = cartSell.AddText(new Info("CartSellText", 0, 0, 270, 135), "Sell (" + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().additive + ")", 40);
+
+                                menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().glueLevel = 10; //this shit is the fucking max tier oh my god
+                            }, () => TowerSelectionMenu.instance.themeManager.currentTheme != null);
+                        }
+                    }
                 }
             }
 
@@ -113,6 +118,10 @@ namespace BonnieHeroMod
             public static void BonnieUIToggle(bool state)
             {
                 bonniePanel.SetActive(state);
+                if (state)
+                {
+                    UpdateUI();
+                }
             }
         }
         public static void CartUpgradeLogic()
@@ -154,7 +163,7 @@ namespace BonnieHeroMod
                 }
 
                 MelonLogger.Msg("Upgrade price: " + currentUpgradePrice);
-                if (currentUpgradePrice > InGame.instance.GetCash())
+                if (currentUpgradePrice < InGame.instance.GetCash())
                 {
                     InGame.instance.SetCash(InGame.instance.GetCash() - currentUpgradePrice);
                     towerLogic.multiplier++; //upgrade cart tier by 1

@@ -32,6 +32,8 @@ using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors;
 using Il2CppAssets.Scripts.Models.GenericBehaviors;
 using static Il2CppAssets.Scripts.Utils.ObjectCache;
+using Il2CppAssets.Scripts.Data;
+using Il2CppAssets.Scripts.Models.Profile;
 
 [assembly: MelonInfo(typeof(BonnieHeroMod.BonnieHeroMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -83,7 +85,6 @@ public class BonnieHeroMod : BloonsTD6Mod
 
     public override void OnTowerCreated(Tower tower, Entity target, Model modelToUse)
     {
-        MelonLogger.Warning("THIS IS AN UNFINISHED VERSION OF BonnieHeroMod GLITCHES WILL OCCUR");
         base.OnTowerCreated(tower, target, modelToUse);
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
         {
@@ -121,6 +122,10 @@ public class BonnieHeroMod : BloonsTD6Mod
             {
                 BonnieLogic.BonnieUI.BonnieUIToggle(true);
             }
+            else
+            {
+               BonnieLogic.BonnieUI.Init(TowerSelectionMenu.instance);
+            }
         }
     }
 
@@ -133,6 +138,36 @@ public class BonnieHeroMod : BloonsTD6Mod
             {
                 BonnieLogic.BonnieUI.BonnieUIToggle(false);
             }
+        }
+    }
+    public override void OnTowerSaved(Tower tower, TowerSaveDataModel saveData)
+    {
+        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
+        {
+            var MinecartTier = tower.GetMutator("MinecartTier")?.TryCast<RangeSupport.MutatorTower>();
+            if (MinecartTier != null)
+            {
+                saveData.metaData["MinecartTier"] = MinecartTier.multiplier.ToString();
+                saveData.metaData["MinecartTierBank"] = MinecartTier.additive.ToString();
+                saveData.metaData["MinecartMaxTier"] = MinecartTier.glueLevel.ToString();
+            }
+        }
+    }
+
+    public override void OnTowerLoaded(Tower tower, TowerSaveDataModel saveData)
+    {
+        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
+        {
+            if (tower.mutators != null)
+                tower.RemoveMutatorsById("MinecartTier");
+
+            saveData.metaData.TryGetValue("MinecartTier", out var minecartTier);
+            saveData.metaData.TryGetValue("MinecartTierBank", out var minecartTierBank);
+            saveData.metaData.TryGetValue("MinecartMaxTier", out var minecartMaxTier);
+
+            var minecartMutator = new RangeSupport.MutatorTower(false, "MinecartTier", float.Parse(minecartTierBank), float.Parse(minecartTier), null);
+            minecartMutator.glueLevel = int.Parse(minecartMaxTier);
+            tower.AddMutator(minecartMutator);
         }
     }
 

@@ -119,7 +119,6 @@ namespace BonnieHeroMod
         {
             var currentUpgradePrice = 0f;
             var nextUpgradePrice = 0f;
-            var canUpgrade = true;
 
             MelonLogger.Msg("Cart tier initial value at run: " + towerLogic.multiplier);
 
@@ -155,12 +154,14 @@ namespace BonnieHeroMod
                 }
 
                 MelonLogger.Msg("Upgrade price: " + currentUpgradePrice);
+                if (currentUpgradePrice > InGame.instance.GetCash())
+                {
+                    InGame.instance.SetCash(InGame.instance.GetCash() - currentUpgradePrice);
+                    towerLogic.multiplier++; //upgrade cart tier by 1
+                    towerLogic.additive += currentUpgradePrice * 0.7f; //add cash to "bank"
 
-                InGame.instance.SetCash(InGame.instance.GetCash() - currentUpgradePrice);
-                towerLogic.multiplier++; //upgrade cart tier by 1
-                towerLogic.additive += currentUpgradePrice * 0.7f; //add cash to "bank"
-
-                BonnieUI.UpdateUI();
+                    BonnieUI.UpdateUI();
+                }
             }
         }
 

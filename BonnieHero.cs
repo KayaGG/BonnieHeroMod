@@ -80,6 +80,7 @@ public class BonnieHero : ModHero
         projectile.pierce = 1.0f;
         projectile.maxPierce = 1.0f;
         projectile.GetBehavior<AgeModel>().lifespan = 10f;
+        projectile.RemoveBehavior<FadeProjectileModel>();
         projectile.AddBehavior(explosion);
 
         explosion.projectile.radius = 30f;
@@ -224,6 +225,8 @@ public class BonnieHero : ModHero
                 var projectile = attackModel.weapons[0].projectile;
 
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.GetDamageModel().damage = 4f;
+
+                projectile.GetBehavior<AgeModel>().rounds = 10;
             }
         }
 

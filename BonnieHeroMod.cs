@@ -55,6 +55,7 @@ public class BonnieHeroMod : BloonsTD6Mod
                 case 2:
                     BonnieLogic.BonnieUI.Init(TowerSelectionMenu.instance);
                     tower.AddMutator(new RangeSupport.MutatorTower(false, "MinecartTier", 0, 0, null));
+                    tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().glueLevel = 10;
                     break;
                 case 5:
                     towerLogic.glueLevel = 15;
@@ -93,6 +94,7 @@ public class BonnieHeroMod : BloonsTD6Mod
             {
                 BonnieLogic.BonnieUI.Init(TowerSelectionMenu.instance);
                 tower.AddMutator(new RangeSupport.MutatorTower(false, "MinecartTier", 0, 0, null));
+                tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().glueLevel = 10;
             }
         }
     }
@@ -108,7 +110,6 @@ public class BonnieHeroMod : BloonsTD6Mod
                 var towerLogic = tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
                 BonnieLogic.CartSellLogic();
                 towerLogic.glueLevel = 10;
-                
             }
         }
     }
@@ -160,15 +161,17 @@ public class BonnieHeroMod : BloonsTD6Mod
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
         {
             if (tower.mutators != null)
+            {
                 tower.RemoveMutatorsById("MinecartTier");
 
-            saveData.metaData.TryGetValue("MinecartTier", out var minecartTier);
-            saveData.metaData.TryGetValue("MinecartTierBank", out var minecartTierBank);
-            saveData.metaData.TryGetValue("MinecartMaxTier", out var minecartMaxTier);
+                saveData.metaData.TryGetValue("MinecartTier", out var minecartTier);
+                saveData.metaData.TryGetValue("MinecartTierBank", out var minecartTierBank);
+                saveData.metaData.TryGetValue("MinecartMaxTier", out var minecartMaxTier);
 
-            var minecartMutator = new RangeSupport.MutatorTower(false, "MinecartTier", float.Parse(minecartTierBank), float.Parse(minecartTier), null);
-            minecartMutator.glueLevel = int.Parse(minecartMaxTier);
-            tower.AddMutator(minecartMutator);
+                var minecartMutator = new RangeSupport.MutatorTower(false, "MinecartTier", float.Parse(minecartTierBank), float.Parse(minecartTier), null);
+                minecartMutator.glueLevel = int.Parse(minecartMaxTier);
+                tower.AddMutator(minecartMutator);
+            }
         }
     }
 

@@ -119,9 +119,6 @@ public class BloonstoneCart : ModBloon
 
             projectile.EmittedBy = bonnieHero;
             projectile.lifespan = 999999;
-
-
-            MelonLogger.Msg("projectile spawned");
             }
             
         }

@@ -16,11 +16,8 @@ namespace BonnieHeroMod
 {
     public class BonnieLogic
     {
-        public static RangeSupport.MutatorTower towerLogic = BonnieUI.menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
-
         public class BonnieUI
         {
-
             public static TowerSelectionMenu menu;
 
             public static ModHelperPanel bonniePanel;
@@ -41,12 +38,44 @@ namespace BonnieHeroMod
                         {
                             BTD_Mod_Helper.Api.TaskScheduler.ScheduleTask(() =>
                             {
-                                MelonLogger.Msg("BonnieUI Init");
                                 menu = tsm;
 
                                 bonniePanel = TowerSelectionMenu.instance.themeManager.currentTheme.gameObject.AddModHelperPanel(new Info("BonniePanel", InfoPreset.FillParent));
 
-                                cartTier = bonniePanel.AddText(new Info("CartLevel", 250, -75, 270, 135), "Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier);
+                                var cartWorth = 50f;
+
+                                for (int i = 0; i < menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier; i++)
+                                {
+                                    switch (i)
+                                    {
+                                        case < 5:
+                                            cartWorth += 10f;
+                                            break;
+                                        case < 10:
+                                            cartWorth += 40f;
+                                            break;
+                                        case < 15:
+                                            cartWorth += 100f;
+                                            break;
+                                        case < 20:
+                                            cartWorth += 160f;
+                                            break;
+                                        case < 25:
+                                            cartWorth += 280f;
+                                            break;
+                                        case < 30:
+                                            cartWorth += 400f;
+                                            break;
+                                        case < 35:
+                                            cartWorth += 600f;
+                                            break;
+                                        case < 40:
+                                            cartWorth += 800f;
+                                            break;
+                                    }
+                                }
+
+                                cartTier = bonniePanel.AddText(new Info("CartTier", 220, -120, 400, 135), "Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + "\n Worth: " + cartWorth, 40, Il2CppTMPro.TextAlignmentOptions.TopRight);
 
                                 cartUpgrade = bonniePanel.AddButton(new Info("CartUpgrade", -225, -580, 270, 135), VanillaSprites.GreenBtnLong,
                                     new System.Action(() =>
@@ -55,22 +84,15 @@ namespace BonnieHeroMod
                                     }));
                                 upgradeText = cartUpgrade.AddText(new Info("CartUpgradeText", 0, 0, 270, 135), "Upgrade (" + 240 + ")");
 
-                                //cartUpgradeText = bonniePanel.AddText(new Info("CartUpgradeText", -225, -580, 270, 135), "Upgrade");
-
                                 cartSell = bonniePanel.AddButton(new Info("CartSell", 225, -580, 270, 135), VanillaSprites.RedBtnLong,
                                     new System.Action(() =>
                                     {
                                         CartSellLogic();
                                     }));
                                 sellText = cartSell.AddText(new Info("CartSellText", 0, 0, 270, 135), "Sell (" + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().additive + ")", 40);
-                                towerLogic.additive = 0;
-                                towerLogic.multiplier = 0;
-                                towerLogic.glueLevel = 10;
+
+                                UpdateUI();
                             }, () => TowerSelectionMenu.instance.themeManager.currentTheme != null);
-                        }
-                        else
-                        {
-                            MelonLogger.Msg("Bonnie placed while panel exists");
                         }
                     }
                 }
@@ -78,29 +100,62 @@ namespace BonnieHeroMod
 
             public static void UpdateUI()
             {
+                var towerLogic = menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
                 var nextUpgradePrice = 0f;
+                var cartWorth = 50f;
+
+                for (int i = 0; i < towerLogic.multiplier; i++)
+                {
+                    switch (i)
+                    {
+                        case < 5:
+                            cartWorth += 10f;
+                            break;
+                        case < 10:
+                            cartWorth += 40f;
+                            break;
+                        case < 15:
+                            cartWorth += 100f;
+                            break;
+                        case < 20:
+                            cartWorth += 160f;
+                            break;
+                        case < 25:
+                            cartWorth += 280f;
+                            break;
+                        case < 30:
+                            cartWorth += 400f;
+                            break;
+                        case < 35:
+                            cartWorth += 600f;
+                            break;
+                        case < 40:
+                            cartWorth += 800f;
+                            break;
+                    }
+                }
 
                 switch (towerLogic.multiplier + 1)
                 {
-                    case < 5:
+                    case <= 5:
                         nextUpgradePrice = 240f;
                         break;
-                    case < 10:
+                    case <= 10:
                         nextUpgradePrice = 1000f;
                         break;
-                    case < 15:
+                    case <= 15:
                         nextUpgradePrice = 2700f;
                         break;
-                    case < 20:
+                    case <= 20:
                         nextUpgradePrice = 4800f;
                         break;
-                    case < 25:
+                    case <= 25:
                         nextUpgradePrice = 8800f;
                         break;
-                    case < 30:
+                    case <= 30:
                         nextUpgradePrice = 13000f;
                         break;
-                    case < 35:
+                    case <= 35:
                         nextUpgradePrice = 21000f;
                         break;
                     case <= 40:
@@ -108,7 +163,7 @@ namespace BonnieHeroMod
                         break;
                 }
 
-                cartTier.SetText("Cart tier: " + towerLogic.multiplier);
+                cartTier.SetText("Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + "\n Worth: " + cartWorth);
                 sellText.SetText("Sell (" + towerLogic.additive + ")");
                 if (towerLogic.multiplier != towerLogic.glueLevel)
                 {
@@ -131,9 +186,8 @@ namespace BonnieHeroMod
         }
         public static void CartUpgradeLogic()
         {
+            var towerLogic = BonnieUI.menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
             var currentUpgradePrice = 0f;
-
-            MelonLogger.Msg("Cart tier initial value at run: " + towerLogic.multiplier);
 
             if (towerLogic.multiplier < towerLogic.glueLevel)
             {
@@ -166,7 +220,6 @@ namespace BonnieHeroMod
                         break;
                 }
 
-                MelonLogger.Msg("Upgrade price: " + currentUpgradePrice);
                 if (currentUpgradePrice < InGame.instance.GetCash())
                 {
                     InGame.instance.SetCash(InGame.instance.GetCash() - currentUpgradePrice);
@@ -180,6 +233,7 @@ namespace BonnieHeroMod
 
         public static void CartSellLogic()
         {
+            var towerLogic = BonnieUI.menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
             towerLogic.multiplier = 0; //set cart tier to 0
             InGame.instance.SetCash(InGame.instance.GetCash() + towerLogic.additive);
             towerLogic.additive = 0; //set "bank" to 0

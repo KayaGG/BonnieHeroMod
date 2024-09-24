@@ -34,6 +34,7 @@ using Il2CppAssets.Scripts.Models.GenericBehaviors;
 using static Il2CppAssets.Scripts.Utils.ObjectCache;
 using Il2CppAssets.Scripts.Data;
 using Il2CppAssets.Scripts.Models.Profile;
+using Il2CppAssets.Scripts.Simulation;
 
 [assembly: MelonInfo(typeof(BonnieHeroMod.BonnieHeroMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -124,7 +125,7 @@ public class BonnieHeroMod : BloonsTD6Mod
             }
             else
             {
-               BonnieLogic.BonnieUI.Init(TowerSelectionMenu.instance);
+                BonnieLogic.BonnieUI.Init(TowerSelectionMenu.instance);
             }
         }
     }

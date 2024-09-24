@@ -63,9 +63,14 @@ namespace BonnieHeroMod
                                         CartSellLogic();
                                     }));
                                 sellText = cartSell.AddText(new Info("CartSellText", 0, 0, 270, 135), "Sell (" + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().additive + ")", 40);
-
-                                menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().glueLevel = 10; //this shit is the fucking max tier oh my god
+                                towerLogic.additive = 0;
+                                towerLogic.multiplier = 0;
+                                towerLogic.glueLevel = 10;
                             }, () => TowerSelectionMenu.instance.themeManager.currentTheme != null);
+                        }
+                        else
+                        {
+                            MelonLogger.Msg("Bonnie placed while panel exists");
                         }
                     }
                 }
@@ -98,7 +103,7 @@ namespace BonnieHeroMod
                     case < 35:
                         nextUpgradePrice = 21000f;
                         break;
-                    case < 40:
+                    case <= 40:
                         nextUpgradePrice = 29000f;
                         break;
                 }
@@ -127,7 +132,6 @@ namespace BonnieHeroMod
         public static void CartUpgradeLogic()
         {
             var currentUpgradePrice = 0f;
-            var nextUpgradePrice = 0f;
 
             MelonLogger.Msg("Cart tier initial value at run: " + towerLogic.multiplier);
 

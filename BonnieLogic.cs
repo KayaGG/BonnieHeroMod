@@ -75,21 +75,21 @@ namespace BonnieHeroMod
                                     }
                                 }
 
-                                cartTier = bonniePanel.AddText(new Info("CartTier", 220, -120, 400, 135), "Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + "\n Worth: " + cartWorth, 40, Il2CppTMPro.TextAlignmentOptions.TopRight);
+                                cartTier = bonniePanel.AddText(new Info("CartTier", 220, -120, 400, 145), "Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + "\n Worth: " + cartWorth, 40, Il2CppTMPro.TextAlignmentOptions.TopRight);
 
-                                cartUpgrade = bonniePanel.AddButton(new Info("CartUpgrade", -225, -580, 270, 135), VanillaSprites.GreenBtnLong,
+                                cartUpgrade = bonniePanel.AddButton(new Info("CartUpgrade", -225, -580, 300, 145), VanillaSprites.GreenBtnLong,
                                     new System.Action(() =>
                                     {
                                         CartUpgradeLogic();
                                     }));
-                                upgradeText = cartUpgrade.AddText(new Info("CartUpgradeText", 0, 0, 270, 135), "Upgrade (" + 240 + ")");
+                                upgradeText = cartUpgrade.AddText(new Info("CartUpgradeText", 0, 5, 300, 145), "Upgrade \n(" + 240 + ")");
 
-                                cartSell = bonniePanel.AddButton(new Info("CartSell", 225, -580, 270, 135), VanillaSprites.RedBtnLong,
+                                cartSell = bonniePanel.AddButton(new Info("CartSell", 225, -580, 300, 145), VanillaSprites.RedBtnLong,
                                     new System.Action(() =>
                                     {
                                         CartSellLogic();
                                     }));
-                                sellText = cartSell.AddText(new Info("CartSellText", 0, 0, 270, 135), "Sell (" + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().additive + ")", 40);
+                                sellText = cartSell.AddText(new Info("CartSellText", 0, 5, 300, 135), "Sell \n(" + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().additive + ")", 40);
 
                                 UpdateUI();
                             }, () => TowerSelectionMenu.instance.themeManager.currentTheme != null);
@@ -167,10 +167,10 @@ namespace BonnieHeroMod
                         }
 
                         cartTier.SetText("Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + "\n Worth: " + cartWorth);
-                        sellText.SetText("Sell (" + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().additive + ")");
+                        sellText.SetText("Sell \n(" + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().additive + ")");
                         if (menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier != menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().glueLevel)
                         {
-                            upgradeText.SetText("Upgrade (" + nextUpgradePrice + ")");
+                            upgradeText.SetText("Upgrade \n(" + nextUpgradePrice + ")");
                         }
                         else
                         {

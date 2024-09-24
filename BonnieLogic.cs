@@ -100,78 +100,83 @@ namespace BonnieHeroMod
 
             public static void UpdateUI()
             {
-                var towerLogic = menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
-                var nextUpgradePrice = 0f;
-                var cartWorth = 50f;
-
-                for (int i = 0; i < towerLogic.multiplier; i++)
+                if (TowerSelectionMenu.instance.selectedTower != null)
                 {
-                    switch (i)
+                    if (TowerSelectionMenu.instance.selectedTower.tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
                     {
-                        case < 5:
-                            cartWorth += 10f;
-                            break;
-                        case < 10:
-                            cartWorth += 40f;
-                            break;
-                        case < 15:
-                            cartWorth += 100f;
-                            break;
-                        case < 20:
-                            cartWorth += 160f;
-                            break;
-                        case < 25:
-                            cartWorth += 280f;
-                            break;
-                        case < 30:
-                            cartWorth += 400f;
-                            break;
-                        case < 35:
-                            cartWorth += 600f;
-                            break;
-                        case < 40:
-                            cartWorth += 800f;
-                            break;
+                        var nextUpgradePrice = 0f;
+                        var cartWorth = 50f;
+
+                        for (int i = 0; i < menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier; i++)
+                        {
+                            switch (i)
+                            {
+                                case < 5:
+                                    cartWorth += 10f;
+                                    break;
+                                case < 10:
+                                    cartWorth += 40f;
+                                    break;
+                                case < 15:
+                                    cartWorth += 100f;
+                                    break;
+                                case < 20:
+                                    cartWorth += 160f;
+                                    break;
+                                case < 25:
+                                    cartWorth += 280f;
+                                    break;
+                                case < 30:
+                                    cartWorth += 400f;
+                                    break;
+                                case < 35:
+                                    cartWorth += 600f;
+                                    break;
+                                case < 40:
+                                    cartWorth += 800f;
+                                    break;
+                            }
+                        }
+
+                        switch (menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + 1)
+                        {
+                            case <= 5:
+                                nextUpgradePrice = 240f;
+                                break;
+                            case <= 10:
+                                nextUpgradePrice = 1000f;
+                                break;
+                            case <= 15:
+                                nextUpgradePrice = 2700f;
+                                break;
+                            case <= 20:
+                                nextUpgradePrice = 4800f;
+                                break;
+                            case <= 25:
+                                nextUpgradePrice = 8800f;
+                                break;
+                            case <= 30:
+                                nextUpgradePrice = 13000f;
+                                break;
+                            case <= 35:
+                                nextUpgradePrice = 21000f;
+                                break;
+                            case <= 40:
+                                nextUpgradePrice = 29000f;
+                                break;
+                        }
+
+                        cartTier.SetText("Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + "\n Worth: " + cartWorth);
+                        sellText.SetText("Sell (" + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().additive + ")");
+                        if (menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier != menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().glueLevel)
+                        {
+                            upgradeText.SetText("Upgrade (" + nextUpgradePrice + ")");
+                        }
+                        else
+                        {
+                            upgradeText.SetText("Max Tier Reached");
+                        }
                     }
-                }
-
-                switch (towerLogic.multiplier + 1)
-                {
-                    case <= 5:
-                        nextUpgradePrice = 240f;
-                        break;
-                    case <= 10:
-                        nextUpgradePrice = 1000f;
-                        break;
-                    case <= 15:
-                        nextUpgradePrice = 2700f;
-                        break;
-                    case <= 20:
-                        nextUpgradePrice = 4800f;
-                        break;
-                    case <= 25:
-                        nextUpgradePrice = 8800f;
-                        break;
-                    case <= 30:
-                        nextUpgradePrice = 13000f;
-                        break;
-                    case <= 35:
-                        nextUpgradePrice = 21000f;
-                        break;
-                    case <= 40:
-                        nextUpgradePrice = 29000f;
-                        break;
-                }
-
-                cartTier.SetText("Cart tier: " + menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + "\n Worth: " + cartWorth);
-                sellText.SetText("Sell (" + towerLogic.additive + ")");
-                if (towerLogic.multiplier != towerLogic.glueLevel)
-                {
-                    upgradeText.SetText("Upgrade (" + nextUpgradePrice + ")");
-                }
-                else
-                {
-                    upgradeText.SetText("Max Tier Reached");
                 }
             }
 

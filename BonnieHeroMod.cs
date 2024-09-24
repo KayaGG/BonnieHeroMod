@@ -83,6 +83,7 @@ public class BonnieHeroMod : BloonsTD6Mod
 
     public override void OnTowerCreated(Tower tower, Entity target, Model modelToUse)
     {
+        MelonLogger.Warning("THIS IS AN UNFINISHED VERSION OF BonnieHeroMod GLITCHES WILL OCCUR");
         base.OnTowerCreated(tower, target, modelToUse);
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
         {

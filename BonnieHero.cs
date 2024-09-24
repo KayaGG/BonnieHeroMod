@@ -30,6 +30,7 @@ using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
 using static BonnieHeroMod.BonnieHeroMod;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Models;
+using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities;
 
 namespace BonnieHeroMod;
 
@@ -134,11 +135,15 @@ public class BonnieHero : ModHero
 
         public class Level3 : ModHeroLevel<BonnieHero>
         {
+            public override string AbilityName => "Mass Detonation";
+
+            public override string AbilityDescription => "Bonnie throws dynamite at every minecart at once, destroying them and any bloons around them.";
+
             public override string Description => "Mass Detonation - Bonnie throws dynamite at every minecart at once, destroying them and any bloons around them.";
             public override int Level => 3;
             public override void ApplyUpgrade(TowerModel towerModel)
             {
-                    
+                //var abilityModel = new AbilityModel("MassDetonation", AbilityName, AbilityDescription, null, null, null, );
             }
         }
 
@@ -162,8 +167,8 @@ public class BonnieHero : ModHero
             public override string Description => "Minecarts can now be upgraded to $800 per cart.";
             public override int Level => 5;
             public override void ApplyUpgrade(TowerModel towerModel)
-            {
-                
+            {   
+
             }
         }
 
@@ -224,6 +229,10 @@ public class BonnieHero : ModHero
 
         public class Level10 : ModHeroLevel<BonnieHero>
         {
+            public override string AbilityName => "B.E.A.S.T";
+
+            public override string AbilityDescription => "Calls forth the Bloonstone Excavation And Supply Truck which stuns bloons by running them over. Continually drops bloonstones as it takes damage from monkey attacks.";
+
             public override string Description => "B.E.A.S.T. - Calls forth the Bloonstone Excavation And Supply Truck which stuns bloons by running them over. Continually drops bloonstones as it takes damage from monkey attacks.";
             public override int Level => 10;
             public override void ApplyUpgrade(TowerModel towerModel)
@@ -349,122 +358,6 @@ public class BonnieHero : ModHero
             }
         }
     }
-
-    /*[HarmonyPatch(typeof(BankDeposits), nameof(BankDeposits.GetDepositAmount))]
-    [HarmonyPostfix]
-    public static void DepositPostfix(BankDeposits __instance, ref float __result)
-    {
-        if (__instance.tower.namedMonkeyKey == "Bonnie")
-        {
-            var bank = __instance.tower.GetTowerBehavior<Bank>();
-
-            //MelonLogger.Msg("bank.cash " + bank.cash);
-
-            if (bank.cash != bank.bankModel.capacity)
-            {
-                var upgradePrice = 1f;
-                switch (__instance.tower.necroBloonsReanimated)
-                {
-                    case < 5:
-                        upgradePrice = 240f;
-                        __result = upgradePrice;
-                        break;
-                    case < 10:
-                        upgradePrice = 1000f;
-                        __result = upgradePrice;
-                        break;
-                    case < 15:
-                        upgradePrice = 2700f;
-                        __result = upgradePrice;
-                        break;
-                    case < 20:
-                        upgradePrice = 4800f;
-                        __result = upgradePrice;
-                        break;
-                    case < 25:
-                        upgradePrice = 8800f;
-                        __result = upgradePrice;
-                        break;
-                    case < 30:
-                        upgradePrice = 13000f;
-                        __result = upgradePrice;
-                        break;
-                    case < 35:
-                        upgradePrice = 21000f;
-                        __result = upgradePrice;
-                        break;
-                    case < 40:
-                        upgradePrice = 29000f;
-                        __result = upgradePrice;
-                        break;
-
-                    //281890
-                }
-                //__instance.tower.necroBloonsReanimated += 1;
-            }
-        }
-    }*/
-
-    /*[HarmonyPatch(typeof(TSMThemeBananaFarm), nameof(TSMThemeBananaFarm.OnButtonPress))]
-    [HarmonyPostfix]
-    public static void Postfix(TowerToSimulation tower, TSMButton button)
-    {
-        if (tower.namedMonkeyKey == "Bonnie")
-        {
-            if (button.name == "BankDepositBtn")
-            {
-                tower.tower.necroBloonsReanimated += 1;
-                var bonnieHero = tower.tower;
-                var cashProjectile;
-                switch (tower.tower.necroBloonsReanimated)
-                {
-                    case <= 5:
-                        cashProjectile.GetBehavior<CashModel>().minimum += bonnieHero.necroBloonsReanimated * 10;
-                        cashProjectile.GetBehavior<CashModel>().maximum += bonnieHero.necroBloonsReanimated * 10;
-                        break;
-                    case <= 10:
-                        cashProjectile.GetBehavior<CashModel>().minimum = 40;
-                        cashProjectile.GetBehavior<CashModel>().maximum = 40;
-                        break;
-                    case <= 15:
-                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        break;
-                    case <= 20:
-                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        break;
-                    case <= 25:
-                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        break;
-                    case <= 30:
-                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        break;
-                    case <= 35:
-                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        break;
-                    case <= 40:
-                        cashProjectile.GetBehavior<CashModel>().minimum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        cashProjectile.GetBehavior<CashModel>().maximum = 50 + bonnieHero.necroBloonsReanimated * 10;
-                        break;
-                }
-            }
-            if (button.name == "BankCollectBtn")
-            {
-                tower.tower.necroBloonsReanimated = 0;
-            }
-        }
-    }*/
-
-    /*[HarmonyPatch(typeof(Bank), nameof(Bank.Collect))]
-    [HarmonyPostfix]
-    public static void BankPostfix(Bank __instance, ref float __result)
-    {
-        MelonLogger.Msg(__result);
-    }*/
 }
 
 class BonnieDisplay : ModDisplay

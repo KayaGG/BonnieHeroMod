@@ -40,16 +40,10 @@ public class BloonstoneCart : ModBloon
         //bloonModel.GetBehavior<CarryProjectileModel>().projectile = farm.GetWeapon().projectile.Duplicate();
     }
 
-    public static class CartLogic
-    {
-
-    }
-
     [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonDegrade))]
     [HarmonyPostfix]
     private static void Bloon_Degrade(Bloon bloon)
     {
-        MelonLogger.Msg("bloon degrade");
         if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
         {
             var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
@@ -58,9 +52,46 @@ public class BloonstoneCart : ModBloon
                 MelonLogger.Error("bonnie is null");
                 return;
             }
-
+            var towerLogic = bonnieHero.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
             var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile.Duplicate();
             cashProjectile.RemoveBehavior<AgeModel>();
+
+            var cartWorth = 50f;
+
+            for (int i = 0; i < towerLogic.multiplier; i++)
+            {
+                switch (i)
+                {
+                    case < 5:
+                        cartWorth += 10f;
+                        break;
+                    case < 10:
+                        cartWorth += 40f;
+                        break;
+                    case < 15:
+                        cartWorth += 100f;
+                        break;
+                    case < 20:
+                        cartWorth += 160f;
+                        break;
+                    case < 25:
+                        cartWorth += 280f;
+                        break;
+                    case < 30:
+                        cartWorth += 400f;
+                        break;
+                    case < 35:
+                        cartWorth += 600f;
+                        break;
+                    case < 40:
+                        cartWorth += 800f;
+                        break;
+                }
+            }
+
+
+            cashProjectile.GetBehavior<CashModel>().minimum = cartWorth;
+            cashProjectile.GetBehavior<CashModel>().maximum = cartWorth;
 
             var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Projectile, ProjectileModel>(
                 cashProjectile);
@@ -91,6 +122,53 @@ public class BloonstoneCart : ModBloon
 
 
             MelonLogger.Msg("projectile spawned");
+            }
+            
+        }
+    [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonSpawned))]
+    [HarmonyPrefix]
+    private static void Bloon_Spawn(Bloon bloon)
+    {
+        if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
+        {
+            var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+            if (bonnieHero == null)
+            {
+                MelonLogger.Error("bonnie is null");
+                return;
+            }
+            var towerLogic = bonnieHero.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
+
+            for (int i = 0; i < towerLogic.multiplier; i++)
+            {
+                switch (i)
+                {
+                    case < 5:
+                        bloon.health += 1;
+                        break;
+                    case < 10:
+                        bloon.health += 2;
+                        break;
+                    case < 15:
+                        bloon.health += 7;
+                        break;
+                    case < 20:
+                        bloon.health += 60;
+                        break;
+                    case < 25:
+                        bloon.health += 120;
+                        break;
+                    case < 30:
+                        bloon.health += 280;
+                        break;
+                    case < 35:
+                        bloon.health += 400;
+                        break;
+                    case < 40:
+                        bloon.health += 600;
+                        break;
+                }
+            }
         }
     }
 
@@ -107,5 +185,4 @@ public class BloonstoneCart : ModBloon
             }
         }
     }
-
 }

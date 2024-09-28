@@ -31,6 +31,7 @@ using static BonnieHeroMod.BonnieHeroMod;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Models;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities;
+using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
 
 namespace BonnieHeroMod;
 
@@ -58,8 +59,8 @@ public class BonnieHero : ModHero
         var attackModel = towerModel.GetAttackModel();
         var projectile = attackModel.weapons[0].projectile;
         var caltropsBehavior = Game.instance.model.GetTowerFromId("NinjaMonkey-002").GetAttackModel(1).GetBehavior<RotateToTargetModel>().Duplicate();
-        var explosion = Game.instance.model.GetTower("BombShooter").GetWeapon().projectile.GetBehavior<
-            CreateProjectileOnContactModel>().Duplicate();
+        var explosion = Game.instance.model.GetTower("BombShooter").GetWeapon().projectile.GetBehavior<CreateProjectileOnContactModel>().Duplicate();
+        var explosionSound = Game.instance.model.GetTower("BombShooter").GetWeapon().projectile.GetBehavior<CreateSoundOnProjectileCollisionModel>().Duplicate();
 
         towerModel.mods = quincy.mods;
         towerModel.ApplyDisplay<BonnieDisplay>();
@@ -85,13 +86,14 @@ public class BonnieHero : ModHero
 
         explosion.projectile.radius = 30f;
         explosion.projectile.SetHitCamo(true);
+        projectile.AddBehavior(explosionSound);
 
         projectile.AddBehavior(Game.instance.model.GetTower("MortarMonkey").GetWeapon().projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>().Duplicate());
         var effectOnExpire = projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>();
         var effectOnExhaust = new CreateEffectOnExhaustedModel("CreateEffectOnExhaustedModel_", effectOnExpire.assetId,
             effectOnExpire.lifespan, effectOnExpire.fullscreen, effectOnExpire.randomRotation,
             effectOnExpire.effectModel);
-        projectile.AddBehavior(effectOnExhaust);
+        explosion.projectile.AddBehavior(effectOnExhaust);
     }
 
     [HarmonyPatch(typeof(RangeSupport.MutatorTower), nameof(RangeSupport.MutatorTower.Mutate))]
@@ -119,7 +121,7 @@ public class BonnieHero : ModHero
             public override int Level => 2;
             public override void ApplyUpgrade(TowerModel towerModel)
             {
-                var bankModel = Game.instance.model.GetTowerFromId("BananaFarm-040").GetBehavior<BankModel>().Duplicate();
+                /*var bankModel = Game.instance.model.GetTowerFromId("BananaFarm-040").GetBehavior<BankModel>().Duplicate();
                 BankDepositsModel depoModel = new("BankDepositModel_", 0f, new(), 0);
 
                 //depoModel.depositPercent = 20f;
@@ -128,7 +130,7 @@ public class BonnieHero : ModHero
                 bankModel.capacity = 999999f;
                 bankModel.interest = 0f;
                 towerModel.AddBehavior(bankModel);
-                towerModel.AddBehavior(depoModel);
+                towerModel.AddBehavior(depoModel);*/
 
                 //towerModel.towerSelectionMenuThemeId = "BananaFarmDeposit";
             }
@@ -144,7 +146,22 @@ public class BonnieHero : ModHero
             public override int Level => 3;
             public override void ApplyUpgrade(TowerModel towerModel)
             {
-                //var abilityModel = new AbilityModel("MassDetonation", AbilityName, AbilityDescription, null, null, null, );
+                //var abilityModel = new AbilityModel("MassDetonation", AbilityName, AbilityDescription, null, null, null, 30f, );
+                var quincy = Game.instance.model.GetTowerWithName(TowerType.Quincy + " 3");
+                var abilityModel = quincy.GetAbility().Duplicate();
+                var turbo = abilityModel.GetBehavior<TurboModel>();
+
+                abilityModel.name = "AbilityModel_MassDetonation";
+                abilityModel.displayName = AbilityName;
+                abilityModel.canActivateBetweenRounds = false;
+                abilityModel.RemoveBehavior<CreateEffectOnAbilityModel>();
+                abilityModel.icon = GetSpriteReference("MassDetonation");
+
+                turbo.multiplier = 0.05f;
+                turbo.lifespan = 1f;
+                turbo.Lifespan = 1f;
+
+                towerModel.AddBehavior(abilityModel);
             }
         }
 
@@ -240,7 +257,21 @@ public class BonnieHero : ModHero
             public override int Level => 10;
             public override void ApplyUpgrade(TowerModel towerModel)
             {
+                var quincy = Game.instance.model.GetTowerWithName(TowerType.Quincy + " 3");
+                var homeland = Game.instance.model.GetTowerWithName("MonkeyVillage-050").GetAbility().GetBehavior<CreateSoundOnAbilityModel>();
+                var abilityModel = quincy.GetAbility().Duplicate();
 
+
+                abilityModel.name = "AbilityModel_BEAST";
+                abilityModel.displayName = AbilityName;
+                abilityModel.canActivateBetweenRounds = false;
+                abilityModel.RemoveBehavior<TurboModel>();
+                abilityModel.RemoveBehavior<CreateEffectOnAbilityModel>();
+                abilityModel.RemoveBehavior<CreateSoundOnAbilityModel>();
+                abilityModel.AddBehavior(homeland);
+                abilityModel.icon = GetSpriteReference("BEAST");
+
+                towerModel.AddBehavior(abilityModel);
             }
         }
 

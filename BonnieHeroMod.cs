@@ -35,6 +35,14 @@ using static Il2CppAssets.Scripts.Utils.ObjectCache;
 using Il2CppAssets.Scripts.Data;
 using Il2CppAssets.Scripts.Models.Profile;
 using Il2CppAssets.Scripts.Simulation;
+using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
+using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities;
+using Il2CppAssets.Scripts.Models.Effects;
+using Il2CppAssets.Scripts.Unity.Effects;
+using static MelonLoader.MelonLogger;
+using Il2CppSystem;
+using System.Collections.Generic;
+using Il2CppAssets.Scripts.Unity.Towers.Projectiles;
 
 [assembly: MelonInfo(typeof(BonnieHeroMod.BonnieHeroMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -171,6 +179,67 @@ public class BonnieHeroMod : BloonsTD6Mod
                 var minecartMutator = new RangeSupport.MutatorTower(false, "MinecartTier", float.Parse(minecartTierBank), float.Parse(minecartTier), null);
                 minecartMutator.glueLevel = int.Parse(minecartMaxTier);
                 tower.AddMutator(minecartMutator);
+            }
+        }
+    }
+
+    public override void OnAbilityCast(Ability ability)
+    {
+        base.OnAbilityCast(ability);
+        if (ability.abilityModel.name == "AbilityModel_MassDetonation")
+        {
+
+        }
+    }
+
+    [HarmonyPatch(typeof(Ability), nameof(Ability.Activate))]
+    public static class BonnieAbility
+    {
+        [HarmonyPostfix]
+        public static void baPostfix(Ability __instance)
+        {
+            var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+            if (bonnieHero != null)
+            {
+                if (__instance.abilityModel.name == "AbilityModel_MassDetonation")
+                {
+                    MelonLogger.Msg("Ability firing: " + __instance.abilityModel.displayName);
+                    var bloons = InGame.instance.GetBloons();
+                    if (bloons != null)
+                    {
+                        for (int i = 0; i < bloons.Count; i++)
+                        {
+                            if (bloons[i].bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
+                            {
+                                var attackModel = bonnieHero.towerModel.GetAttackModel();
+                                var dynamite = attackModel.weapons[0].projectile;
+                                var explosion = dynamite.GetBehavior<CreateProjectileOnContactModel>().projectile;
+                                //var explosionEffect = Game.instance.model.GetTower("MortarMonkey").GetWeapon().projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>().Duplicate();
+
+                                var cartExplosionProjectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(explosion);
+
+                                cartExplosionProjectile.Position.X = bloons[i].Position.X;
+                                cartExplosionProjectile.Position.Y = bloons[i].Position.Y;
+                                cartExplosionProjectile.Position.Z = bloons[i].Position.Z;
+
+                                cartExplosionProjectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
+
+                                bloons[i].Degrade(false, bonnieHero, false);
+                            }
+                        }
+                    }
+                }
+                if (__instance.abilityModel.name == "AbilityModel_BEAST")
+                {
+                    InGame.instance.SpawnBloons(ModContent.BloonID<BEAST>(), 1, 0);
+
+                    var beast = InGame.instance.GetBloons().Find(bloon => bloon.bloonModel.baseId == ModContent.TowerID<BonnieHero>());
+
+                    if (beast != null)
+                    {
+                        MelonLogger.Msg(beast.bloonModel.name + " spawned");
+                    }
+                }
             }
         }
     }

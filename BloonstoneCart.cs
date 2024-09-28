@@ -21,6 +21,9 @@ using Il2CppAssets.Scripts.Simulation.Track.RoundManagers;
 using Il2CppAssets.Scripts.Utils;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using static MelonLoader.MelonLogger;
+using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
+using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
+using Il2CppAssets.Scripts.Unity.Towers.Projectiles;
 
 namespace BonnieHeroMod;
 
@@ -31,97 +34,149 @@ public class BloonstoneCart : ModBloon
     public override string Name => "BloonstoneCart";
     public override void ModifyBaseBloonModel(BloonModel bloonModel)
     {
-        //var farm = Game.instance.model.GetTowerWithName(TowerType.BananaFarm);
+        var badImmunity = Game.instance.model.GetBloon("Bad").GetBehavior<BadImmunityModel>().Duplicate();
         bloonModel.display = Game.instance.model.bloonsByName["Golden"].display;
 
         bloonModel.leakDamage = 0;
         bloonModel.maxHealth = 4;
+
+        bloonModel.AddBehavior(badImmunity);
         //bloonModel.GetBehavior<DistributeCashModel>().cash = 50;
         //bloonModel.GetBehavior<CarryProjectileModel>().projectile = farm.GetWeapon().projectile.Duplicate();
     }
 
     [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonDegrade))]
-    [HarmonyPostfix]
-    private static void Bloon_Degrade(Bloon bloon)
+    public class CartDegradeManager
     {
-        if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
+        /*[HarmonyPrefix]
+        private static void BloonDegradePrefix(Bloon bloon)
         {
-            var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
-            if (bonnieHero == null)
+            if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
             {
-                MelonLogger.Error("bonnie is null");
-                return;
-            }
-            var towerLogic = bonnieHero.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
-            var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile.Duplicate();
-            cashProjectile.RemoveBehavior<AgeModel>();
-
-            var cartWorth = 50f;
-
-            for (int i = 0; i < towerLogic.multiplier; i++)
-            {
-                switch (i)
+                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+                if (bonnieHero == null)
                 {
-                    case < 5:
-                        cartWorth += 10f;
-                        break;
-                    case < 10:
-                        cartWorth += 40f;
-                        break;
-                    case < 15:
-                        cartWorth += 100f;
-                        break;
-                    case < 20:
-                        cartWorth += 160f;
-                        break;
-                    case < 25:
-                        cartWorth += 280f;
-                        break;
-                    case < 30:
-                        cartWorth += 400f;
-                        break;
-                    case < 35:
-                        cartWorth += 600f;
-                        break;
-                    case < 40:
-                        cartWorth += 800f;
-                        break;
+                    MelonLogger.Error("bonnie is null");
+                    return;
+                }
+                if (bonnieHero.GetTowerBehavior<Ability>().IsActive)
+                {
+                    var ability = bonnieHero.GetTowerBehavior<Ability>();
+                    if (ability.abilityModel.name == "AbilityModel_MassDetonation")
+                    {
+                        var attackModel = bonnieHero.towerModel.GetAttackModel();
+
+                        var dynamite = attackModel.weapons[0].projectile;
+
+                        var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(dynamite);
+                        var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
+                        arriveAtTarget.SetStartPosition(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X,bloon.Position.Y, 100));
+
+                        var targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X, bloon.Position.Y, 100);
+                        arriveAtTarget.targetPos = targetPos;
+                        arriveAtTarget.timeToTake = 0;
+
+                        projectile.Position.X = bloon.Position.X;
+                        projectile.Position.Y = bloon.Position.Y;
+                        projectile.Position.Z = 20;
+
+                        projectile.direction.X = 0;
+                        projectile.direction.Y = 0;
+                        projectile.direction.Z = 0;
+                        projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
+                        projectile.target = new Target(targetPos);
+
+                        projectile.emittedFrom = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X, bloon.Position.Y, 100);
+
+                        projectile.EmittedBy = bonnieHero;
+                        projectile.lifespan = 999999;
+                    }
                 }
             }
+        }*/
+
+        [HarmonyPostfix]
+        private static void BloonDegradePostfix(Bloon bloon)
+        {
+            if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
+            {
+                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+                if (bonnieHero == null)
+                {
+                    MelonLogger.Error("bonnie is null");
+                    return;
+                }
+                var towerLogic = bonnieHero.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
+                var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile.Duplicate();
+                cashProjectile.RemoveBehavior<AgeModel>();
+
+                var cartWorth = 50f;
+
+                for (int i = 0; i < towerLogic.multiplier; i++)
+                {
+                    switch (i)
+                    {
+                        case < 5:
+                            cartWorth += 10f;
+                            break;
+                        case < 10:
+                            cartWorth += 40f;
+                            break;
+                        case < 15:
+                            cartWorth += 100f;
+                            break;
+                        case < 20:
+                            cartWorth += 160f;
+                            break;
+                        case < 25:
+                            cartWorth += 280f;
+                            break;
+                        case < 30:
+                            cartWorth += 400f;
+                            break;
+                        case < 35:
+                            cartWorth += 600f;
+                            break;
+                        case < 40:
+                            cartWorth += 800f;
+                            break;
+                    }
+                }
 
 
-            cashProjectile.GetBehavior<CashModel>().minimum = cartWorth;
-            cashProjectile.GetBehavior<CashModel>().maximum = cartWorth;
+                cashProjectile.GetBehavior<CashModel>().minimum = cartWorth;
+                cashProjectile.GetBehavior<CashModel>().maximum = cartWorth;
 
-            var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Projectile, ProjectileModel>(
-                cashProjectile);
-            var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
-            const uint dropRange = 20;
-            arriveAtTarget.SetStartPosition(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X,
-                bloon.Position.Y, 100));
+                var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(
+                    cashProjectile);
+                var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
+                const uint dropRange = 20;
+                arriveAtTarget.SetStartPosition(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X,
+                    bloon.Position.Y, 100));
 
-            var targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X + Random.Range(-dropRange, dropRange),
-                bloon.Position.Y + Random.Range(-dropRange, dropRange), 100);
-            arriveAtTarget.targetPos = targetPos;
+                var targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X + Random.Range(-dropRange, dropRange),
+                    bloon.Position.Y + Random.Range(-dropRange, dropRange), 100);
+                arriveAtTarget.targetPos = targetPos;
 
-            projectile.Position.X = bloon.Position.X;
-            projectile.Position.Y = bloon.Position.Y;
-            projectile.Position.Z = 20;
+                projectile.Position.X = bloon.Position.X;
+                projectile.Position.Y = bloon.Position.Y;
+                projectile.Position.Z = 20;
 
-            projectile.direction.X = 0;
-            projectile.direction.Y = 0;
-            projectile.direction.Z = 0;
-            projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
-            projectile.target = new Target(targetPos);
+                projectile.direction.X = 0;
+                projectile.direction.Y = 0;
+                projectile.direction.Z = 0;
+                projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
+                projectile.target = new Target(targetPos);
 
-            projectile.emittedFrom = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X,
-                bloon.Position.Y, 100);
+                projectile.emittedFrom = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X,
+                    bloon.Position.Y, 100);
 
-            projectile.EmittedBy = bonnieHero;
-            projectile.lifespan = 999999;
+                projectile.EmittedBy = bonnieHero;
+                projectile.lifespan = 999999;
             }
-            
         }
+    }
+
     [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonSpawned))]
     [HarmonyPrefix]
     private static void Bloon_Spawn(Bloon bloon)
@@ -168,7 +223,7 @@ public class BloonstoneCart : ModBloon
             }
         }
     }
-    
+
 
     [HarmonyPatch(typeof(InGame), nameof(InGame.RoundStart))]
     [HarmonyPostfix]

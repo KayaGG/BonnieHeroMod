@@ -203,7 +203,6 @@ public class BonnieHeroMod : BloonsTD6Mod
             {
                 if (__instance.abilityModel.name == "AbilityModel_MassDetonation")
                 {
-                    MelonLogger.Msg("Ability firing: " + __instance.abilityModel.displayName);
                     var bloons = InGame.instance.GetBloons();
                     if (bloons != null)
                     {
@@ -233,12 +232,7 @@ public class BonnieHeroMod : BloonsTD6Mod
                 {
                     InGame.instance.SpawnBloons(ModContent.BloonID<BEAST>(), 1, 0);
 
-                    var beast = InGame.instance.GetBloons().Find(bloon => bloon.bloonModel.baseId == ModContent.TowerID<BonnieHero>());
-
-                    if (beast != null)
-                    {
-                        MelonLogger.Msg(beast.bloonModel.name + " spawned");
-                    }
+                    var beast = InGame.instance.GetBloons().Find(bloon => bloon.bloonModel.baseId == ModContent.BloonID<BEAST>());
                 }
             }
         }

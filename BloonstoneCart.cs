@@ -48,53 +48,6 @@ public class BloonstoneCart : ModBloon
     [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonDegrade))]
     public class CartDegradeManager
     {
-        /*[HarmonyPrefix]
-        private static void BloonDegradePrefix(Bloon bloon)
-        {
-            if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
-            {
-                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
-                if (bonnieHero == null)
-                {
-                    MelonLogger.Error("bonnie is null");
-                    return;
-                }
-                if (bonnieHero.GetTowerBehavior<Ability>().IsActive)
-                {
-                    var ability = bonnieHero.GetTowerBehavior<Ability>();
-                    if (ability.abilityModel.name == "AbilityModel_MassDetonation")
-                    {
-                        var attackModel = bonnieHero.towerModel.GetAttackModel();
-
-                        var dynamite = attackModel.weapons[0].projectile;
-
-                        var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(dynamite);
-                        var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
-                        arriveAtTarget.SetStartPosition(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X,bloon.Position.Y, 100));
-
-                        var targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X, bloon.Position.Y, 100);
-                        arriveAtTarget.targetPos = targetPos;
-                        arriveAtTarget.timeToTake = 0;
-
-                        projectile.Position.X = bloon.Position.X;
-                        projectile.Position.Y = bloon.Position.Y;
-                        projectile.Position.Z = 20;
-
-                        projectile.direction.X = 0;
-                        projectile.direction.Y = 0;
-                        projectile.direction.Z = 0;
-                        projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
-                        projectile.target = new Target(targetPos);
-
-                        projectile.emittedFrom = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(bloon.Position.X, bloon.Position.Y, 100);
-
-                        projectile.EmittedBy = bonnieHero;
-                        projectile.lifespan = 999999;
-                    }
-                }
-            }
-        }*/
-
         [HarmonyPostfix]
         private static void BloonDegradePostfix(Bloon bloon)
         {

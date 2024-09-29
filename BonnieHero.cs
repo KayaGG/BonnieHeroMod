@@ -32,6 +32,10 @@ using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Models;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
+using Il2CppAssets.Scripts.Models.Towers.Behaviors.Attack;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using Il2CppSystem.Dynamic.Utils;
+using Il2CppAssets.Scripts.Models.Towers.Weapons;
 
 namespace BonnieHeroMod;
 
@@ -147,21 +151,51 @@ public class BonnieHero : ModHero
             public override void ApplyUpgrade(TowerModel towerModel)
             {
                 //var abilityModel = new AbilityModel("MassDetonation", AbilityName, AbilityDescription, null, null, null, 30f, );
-                var quincy = Game.instance.model.GetTowerWithName(TowerType.Quincy + " 3");
+                //var attackModel = towerModel.GetAttackModel().Duplicate();
+
+                /*var quincy = Game.instance.model.GetTowerWithName(TowerType.Quincy + " 3");
                 var abilityModel = quincy.GetAbility().Duplicate();
+                var subAbilityModel = Game.instance.model.GetTowerWithName("MonkeySub-040").GetAbility().Duplicate();
+                var activateAttackModel = subAbilityModel.GetBehavior<ActivateAttackModel>().Duplicate();
                 var turbo = abilityModel.GetBehavior<TurboModel>();
 
                 abilityModel.name = "AbilityModel_MassDetonation";
                 abilityModel.displayName = AbilityName;
                 abilityModel.canActivateBetweenRounds = false;
                 abilityModel.RemoveBehavior<CreateEffectOnAbilityModel>();
+                abilityModel.RemoveBehavior<TurboModel>();
                 abilityModel.icon = GetSpriteReference("MassDetonation");
 
-                turbo.multiplier = 0.05f;
-                turbo.lifespan = 1f;
-                turbo.Lifespan = 1f;
+                activateAttackModel.attacks.RemoveItem(activateAttackModel.attacks.First());
+                activateAttackModel.cancelIfNoTargets = false;
+                activateAttackModel.attacks.AddItem(attackModel);
+                activateAttackModel.attacks[0].targetProvider = attackModel.targetProvider;
+                activateAttackModel.attacks[0].range = attackModel.range;
+                activateAttackModel.attacks[0].weapons = attackModel.weapons.Duplicate();
+                
+                abilityModel.AddBehavior(activateAttackModel);*/
+
+                var abilityModel = Game.instance.model.GetTowerWithName("SuperMonkey-040").GetAbility().Duplicate();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+                var subAbilitySound = Game.instance.model.GetTowerWithName("MonkeySub-040").GetAbility().GetBehavior<CreateSoundOnAbilityModel>().sound;
+
+                abilityModel.name = "AbilityModel_MassDetonation";
+                abilityModel.displayName = AbilityName;
+                abilityModel.canActivateBetweenRounds = false;
+                abilityModel.icon = GetSpriteReference("MassDetonation");
+                abilityModel.RemoveBehavior<CreateEffectOnAbilityModel>();
+                abilityModel.GetBehavior<CreateSoundOnAbilityModel>().sound = subAbilitySound;
+
+                activateAttackModel.turnOffExisting = false;
+                activateAttackModel.attacks[0] = towerModel.GetAttackModel().Duplicate();
+                for (int i = 1; i <= 7; i++)
+                {
+                    activateAttackModel.attacks[0].AddWeapon(towerModel.GetAttackModel().weapons[0].Duplicate());
+                }
 
                 towerModel.AddBehavior(abilityModel);
+
+                
             }
         }
 
@@ -177,6 +211,14 @@ public class BonnieHero : ModHero
                 attackModel.weapons[0].rate = 2f;
 
                 projectile.GetBehavior<AgeModel>().lifespan = 20f;
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                        activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 
@@ -200,6 +242,14 @@ public class BonnieHero : ModHero
                 var projectile = attackModel.weapons[0].projectile;
 
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.GetDamageModel().damage = 2f;
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                    activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 
@@ -215,6 +265,14 @@ public class BonnieHero : ModHero
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.pierce = 30f;
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.radius = 28f;
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.GetDamageModel().immuneBloonProperties = Il2Cpp.BloonProperties.None;
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                    activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 
@@ -229,6 +287,14 @@ public class BonnieHero : ModHero
 
 
                 projectile.GetBehavior<AgeModel>().lifespan = 40f;
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                    activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 
@@ -244,6 +310,14 @@ public class BonnieHero : ModHero
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.GetDamageModel().damage = 4f;
 
                 projectile.GetBehavior<AgeModel>().rounds = 10;
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                    activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 
@@ -296,6 +370,14 @@ public class BonnieHero : ModHero
                 var moabMod = new DamageModifierForTagModel("DE_BonusMoabDamage", "Moabs", 4, 0, false, true);
 
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.AddBehavior(moabMod);
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                    activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 
@@ -309,6 +391,14 @@ public class BonnieHero : ModHero
                 var projectile = attackModel.weapons[0].projectile;
 
                 projectile.GetBehavior<AgeModel>().lifespan = 80f;
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                    activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 
@@ -332,6 +422,14 @@ public class BonnieHero : ModHero
                 var projectile = attackModel.weapons[0].projectile;
 
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.GetDamageModel().damage = 10f;
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                    activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 
@@ -366,6 +464,14 @@ public class BonnieHero : ModHero
 
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.pierce = 100f;
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.radius = 38f;
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                    activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 
@@ -379,6 +485,14 @@ public class BonnieHero : ModHero
                 var projectile = attackModel.weapons[0].projectile;
 
                 projectile.GetBehavior<CreateProjectileOnContactModel>().projectile.GetDamageModel().damage = 60f;
+
+                var abilityModel = towerModel.GetAbility();
+                var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
+
+                for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)
+                {
+                    activateAttackModel.attacks[0].SetWeapon(towerModel.GetAttackModel().weapons[0], i);
+                }
             }
         }
 

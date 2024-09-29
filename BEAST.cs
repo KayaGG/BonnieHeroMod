@@ -15,6 +15,11 @@ using MelonLoader;
 using BTD_Mod_Helper.Api;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
 using Il2CppAssets.Scripts.Models.GenericBehaviors;
+using Il2CppAssets.Scripts.Models.Towers.Projectiles;
+using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
+using Il2CppAssets.Scripts.Simulation.Bloons.Behaviors;
+using Il2CppAssets.Scripts.Simulation.Towers.Emissions;
+using Il2CppAssets.Scripts.Models.Towers.Behaviors.Emissions;
 
 namespace BonnieHeroMod
 {
@@ -27,17 +32,6 @@ namespace BonnieHeroMod
         public override void ModifyBaseBloonModel(BloonModel bloonModel)
         {
             var badImmunity = Game.instance.model.GetBloon("Bad").GetBehavior<BadImmunityModel>().Duplicate();
-            /*var moab = Game.instance.model.GetBloon("Moab");
-            bloonModel.SetDisplayGUID("6f2f238e52bdbe048b582029f4ea01b7");
-            bloonModel.collisionGroup = moab.collisionGroup;
-
-            bloonModel.leakDamage = 0;
-            bloonModel.speed = 90f;
-            bloonModel.maxHealth = 2000;
-            bloonModel.AddTag("Moab");
-            bloonModel.AddTag("Moabs");
-            bloonModel.isMoab = true;
-            bloonModel.RemoveAllChildren();*/
 
             bloonModel.SetDisplayGUID("6f2f238e52bdbe048b582029f4ea01b7");
 
@@ -45,6 +39,7 @@ namespace BonnieHeroMod
             bloonModel.speed = 90f;
             bloonModel.maxHealth = 2000;
             bloonModel.disallowCosmetics = true;
+            bloonModel.dontShowInSandbox = true;
             //bloonModel.RemoveTag("Moab");
             //bloonModel.RemoveTag("Moabs");
             bloonModel.RemoveAllChildren();
@@ -84,7 +79,6 @@ namespace BonnieHeroMod
                         bloon.health = 10000;
                         break;
                 }
-
             }
         }
     }

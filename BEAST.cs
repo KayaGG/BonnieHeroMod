@@ -187,7 +187,9 @@ namespace BonnieHeroMod
                     var moabStunDuration = 2;
                     switch (bonnieHero.towerModel.tier)
                     {
-                        case 16:
+                        case < 16:
+                            break;
+                        case < 20:
                             stunDuration = 10;
                             moabStunDuration = 4;
                             break;
@@ -197,7 +199,7 @@ namespace BonnieHeroMod
                             break;
                     }
 
-                    
+
 
                     var slowMutator = new SlowModel.SlowMutator(0, "Stun:BEASTStun", "SniperStun", true, false, 0);
 

@@ -2,7 +2,7 @@ namespace BonnieHeroMod;
 
 public static class ModHelperData
 {
-    public const string WorksOnVersion = "44.0";
+    public const string WorksOnVersion = "44.1";
     public const string Version = "44.0-beta.1";
     public const string Name = "BonnieHeroMod";
 

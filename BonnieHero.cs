@@ -43,7 +43,7 @@ namespace BonnieHeroMod;
 public class BonnieHero : ModHero
 {
     public override string BaseTower => TowerType.SpikeFactory;
-    public override int Cost => 900;
+    public override int Cost => 700;
     public override string DisplayName => "Bonnie";
     public override string Name => "BonnieHero";
     public override string Title => "Bloonstone Miner";
@@ -183,6 +183,8 @@ public class BonnieHero : ModHero
                 abilityModel.displayName = AbilityName;
                 abilityModel.canActivateBetweenRounds = false;
                 abilityModel.icon = GetSpriteReference("MassDetonation");
+                abilityModel.cooldown = 60f;
+                abilityModel.Cooldown = 60f;
                 abilityModel.RemoveBehavior<CreateEffectOnAbilityModel>();
                 abilityModel.GetBehavior<CreateSoundOnAbilityModel>().sound = subAbilitySound;
 
@@ -393,6 +395,8 @@ public class BonnieHero : ModHero
                 projectile.GetBehavior<AgeModel>().lifespan = 80f;
 
                 var abilityModel = towerModel.GetAbility();
+                abilityModel.cooldown = 50f;
+                abilityModel.Cooldown = 50f;
                 var activateAttackModel = abilityModel.GetBehavior<ActivateAttackModel>();
 
                 for (int i = 0; i < activateAttackModel.attacks[0].weapons.Count; i++)

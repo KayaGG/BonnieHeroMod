@@ -2,7 +2,6 @@
 using BTD_Mod_Helper.Api.Enums;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
 using Il2CppAssets.Scripts.Models.Bloons;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +19,17 @@ using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Bloons.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers.Emissions;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Emissions;
+using Il2CppAssets.Scripts.Models.Towers.Weapons;
+using Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Behaviors;
+using UnityEngine;
+using Il2CppAssets.Scripts.Simulation.Towers;
+using Il2CppAssets.Scripts.Simulation.SMath;
+using UnityEngine.UIElements;
 
 namespace BonnieHeroMod
 {
+    //todo fix embrittlement bug
+
     [HarmonyPatch]
     public class BEAST : ModBloon
     {
@@ -37,7 +44,7 @@ namespace BonnieHeroMod
 
             bloonModel.leakDamage = 0;
             bloonModel.speed = 90f;
-            bloonModel.maxHealth = 2000;
+            bloonModel.maxHealth = 4000;
             bloonModel.disallowCosmetics = true;
             bloonModel.dontShowInSandbox = true;
             //bloonModel.RemoveTag("Moab");
@@ -55,7 +62,104 @@ namespace BonnieHeroMod
         {
             if (__instance.bloonModel.baseId == ModContent.BloonID<BEAST>())
             {
-                MelonLogger.Msg("BEAST Damaged");
+                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+                if (bonnieHero == null)
+                {
+                    MelonLogger.Error("bonnie is null");
+                    return;
+                }
+                var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile.Duplicate();
+                cashProjectile.RemoveBehavior<AgeModel>();
+
+                var worth = 50f;
+
+                switch (bonnieHero.towerModel.tier)
+                {
+                    case 16:
+                        worth = 100f;
+                        break;
+                    case 20:
+                        worth = 200f;
+                        break;
+                }
+
+                var onePercent = __instance.bloonModel.maxHealth * 0.01;
+                if (totalAmount > 0)
+                {
+                    var timesToExecute = (int)Math.Floor(((float)totalAmount) / ((float)onePercent));
+
+                    if (__instance.health % onePercent == 0)
+                    {
+                        MelonLogger.Msg("Executing");
+
+                        cashProjectile.GetBehavior<CashModel>().minimum = worth;
+                        cashProjectile.GetBehavior<CashModel>().maximum = worth;
+
+                        var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(
+                            cashProjectile);
+                        var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
+                        const uint dropRange = 20;
+                        arriveAtTarget.SetStartPosition(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(__instance.Position.X,
+                            __instance.Position.Y, 100));
+
+                        var targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(__instance.Position.X + Random.Range(-dropRange, dropRange),
+                            __instance.Position.Y + Random.Range(-dropRange, dropRange), 100);
+                        arriveAtTarget.targetPos = targetPos;
+
+                        projectile.Position.X = __instance.Position.X;
+                        projectile.Position.Y = __instance.Position.Y;
+                        projectile.Position.Z = 20;
+
+                        projectile.direction.X = 0;
+                        projectile.direction.Y = 0;
+                        projectile.direction.Z = 0;
+                        projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
+                        projectile.target = new Target(targetPos);
+
+                        projectile.emittedFrom = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(__instance.Position.X,
+                            __instance.Position.Y, 100);
+
+                        projectile.EmittedBy = bonnieHero;
+                        projectile.lifespan = 999999;
+                    }
+
+                    if (timesToExecute >= 1)
+                    {
+                        for (int i = 0; i <= timesToExecute; i++)
+                        {
+                            MelonLogger.Msg("Executing");
+                            cashProjectile.GetBehavior<CashModel>().minimum = worth;
+                            cashProjectile.GetBehavior<CashModel>().maximum = worth;
+
+                            var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(
+                                cashProjectile);
+                            var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
+                            const uint dropRange = 20;
+                            arriveAtTarget.SetStartPosition(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(__instance.Position.X,
+                                __instance.Position.Y, 100));
+
+                            var targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(__instance.Position.X + Random.Range(-dropRange, dropRange),
+                                __instance.Position.Y + Random.Range(-dropRange, dropRange), 100);
+                            arriveAtTarget.targetPos = targetPos;
+
+                            projectile.Position.X = __instance.Position.X;
+                            projectile.Position.Y = __instance.Position.Y;
+                            projectile.Position.Z = 20;
+
+                            projectile.direction.X = 0;
+                            projectile.direction.Y = 0;
+                            projectile.direction.Z = 0;
+                            projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
+                            projectile.target = new Target(targetPos);
+
+                            projectile.emittedFrom = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(__instance.Position.X,
+                                __instance.Position.Y, 100);
+
+                            projectile.EmittedBy = bonnieHero;
+                            projectile.lifespan = 999999;
+                        }
+                    }
+                }                    
             }
         }
         [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonSpawned))]
@@ -73,11 +177,65 @@ namespace BonnieHeroMod
                 switch (bonnieHero.towerModel.tier)
                 {
                     case 16:
-                        bloon.health = 5000;
-                        break;
-                    case 20:
+                        bloon.bloonModel.maxHealth = 10000;
                         bloon.health = 10000;
                         break;
+                    case 20:
+                        bloon.bloonModel.maxHealth = 20000;
+                        bloon.health = 20000;
+                        break;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(Bloon), nameof(Bloon.Process))]
+        [HarmonyPostfix]
+        private static void BEASTStun(Bloon __instance)
+        {
+            if (__instance.bloonModel.baseId == ModContent.BloonID<BEAST>())
+            {
+                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+                if (bonnieHero == null)
+                {
+                    MelonLogger.Error("bonnie is null");
+                    return;
+                }
+
+                var collisionState = InGame.instance.bridge.Simulation.collisionChecker.GetInRange<Bloon>(__instance.Position.X, __instance.Position.Y, 12);
+
+                if (collisionState == null)
+                    return;
+
+                while (collisionState.MoveNext())
+                {
+                    var bloon = collisionState.Current;
+                    if (bloon == null || bloon.bloonModel.baseId == BloonID<BEAST>())
+                        continue;
+
+                    var stunDuration = 5;
+                    var moabStunDuration = 2;
+                    switch (bonnieHero.towerModel.tier)
+                    {
+                        case 16:
+                            stunDuration = 10;
+                            moabStunDuration = 4;
+                            break;
+                        case 20:
+                            stunDuration = 15;
+                            moabStunDuration = 6;
+                            break;
+                    }
+
+                    var slowMutator = new SlowModel.SlowMutator(0, "Stun:BEASTStun", "SniperStun", true, false, 0);
+
+                    if (!bloon.bloonModel.isMoab)
+                    {
+                        bloon.AddMutator(slowMutator, stunDuration * 60);
+                    }
+                    else
+                    {
+                        bloon.AddMutator(slowMutator, moabStunDuration * 60);
+                    }
                 }
             }
         }

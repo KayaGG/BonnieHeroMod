@@ -63,14 +63,14 @@ public class BloonstoneCart : ModBloon
                 var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile.Duplicate();
                 cashProjectile.RemoveBehavior<AgeModel>();
 
-                var cartWorth = 50f;
+                var cartWorth = 25f;
 
                 for (int i = 0; i < towerLogic.multiplier; i++)
                 {
                     switch (i)
                     {
                         case < 5:
-                            cartWorth += 10f;
+                            cartWorth += 15f;
                             break;
                         case < 10:
                             cartWorth += 40f;

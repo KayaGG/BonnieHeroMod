@@ -14,6 +14,8 @@ using BTD_Mod_Helper.Api.Enums;
 
 namespace BonnieHeroMod
 {
+
+    //todo fix ui init edgecase bugs
     public class BonnieLogic
     {
         public class BonnieUI
@@ -42,14 +44,14 @@ namespace BonnieHeroMod
 
                                 bonniePanel = TowerSelectionMenu.instance.themeManager.currentTheme.gameObject.AddModHelperPanel(new Info("BonniePanel", InfoPreset.FillParent));
 
-                                var cartWorth = 50f;
+                                var cartWorth = 25f;
 
                                 for (int i = 0; i < menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier; i++)
                                 {
                                     switch (i)
                                     {
                                         case < 5:
-                                            cartWorth += 10f;
+                                            cartWorth += 15f;
                                             break;
                                         case < 10:
                                             cartWorth += 40f;
@@ -105,14 +107,14 @@ namespace BonnieHeroMod
                     if (TowerSelectionMenu.instance.selectedTower.tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
                     {
                         var nextUpgradePrice = 0f;
-                        var cartWorth = 50f;
+                        var cartWorth = 25f;
 
                         for (int i = 0; i < menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier; i++)
                         {
                             switch (i)
                             {
                                 case < 5:
-                                    cartWorth += 10f;
+                                    cartWorth += 15f;
                                     break;
                                 case < 10:
                                     cartWorth += 40f;
@@ -141,7 +143,7 @@ namespace BonnieHeroMod
                         switch (menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + 1)
                         {
                             case <= 5:
-                                nextUpgradePrice = 240f;
+                                nextUpgradePrice = 300f;
                                 break;
                             case <= 10:
                                 nextUpgradePrice = 1000f;
@@ -200,7 +202,7 @@ namespace BonnieHeroMod
                 switch (towerLogic.multiplier)
                 {
                     case < 5:
-                        currentUpgradePrice = 240f;
+                        currentUpgradePrice = 300f;
                         break;
                     case < 10:
                         currentUpgradePrice = 1000f;

@@ -24,22 +24,24 @@ using static MelonLoader.MelonLogger;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
 using Il2CppAssets.Scripts.Unity.Towers.Projectiles;
+using Il2CppAssets.Scripts.Simulation.Bloons.Behaviors;
 
 namespace BonnieHeroMod;
 
 [HarmonyPatch]
 public class BloonstoneCart : ModBloon
 {
-    public override string BaseBloon => BloonType.Red;
+    public override string BaseBloon => BloonType.Moab;
     public override string Name => "BloonstoneCart";
     public override void ModifyBaseBloonModel(BloonModel bloonModel)
     {
         var badImmunity = Game.instance.model.GetBloon("Bad").GetBehavior<BadImmunityModel>().Duplicate();
-        bloonModel.display = Game.instance.model.bloonsByName["Golden"].display;
-
+        bloonModel.display = new Il2CppNinjaKiwi.Common.ResourceUtils.PrefabReference("4fbadff7298bb2a4b9dfe597bb0fd6d1");
+        bloonModel.damageDisplayStates = new DamageStateModel[] { };
+        bloonModel.tags = new string[] {"NA"};
         bloonModel.leakDamage = 0;
         bloonModel.maxHealth = 4;
-
+        bloonModel.RemoveAllChildren();
         bloonModel.AddBehavior(badImmunity);
         //bloonModel.GetBehavior<DistributeCashModel>().cash = 50;
         //bloonModel.GetBehavior<CarryProjectileModel>().projectile = farm.GetWeapon().projectile.Duplicate();
@@ -129,8 +131,11 @@ public class BloonstoneCart : ModBloon
             }
         }
     }
+  
 
-    [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonSpawned))]
+        
+        
+        [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonSpawned))]
     [HarmonyPrefix]
     private static void Bloon_Spawn(Bloon bloon)
     {
@@ -176,9 +181,22 @@ public class BloonstoneCart : ModBloon
             }
         }
     }
+    [HarmonyPatch(typeof(Bloon), nameof(Bloon.Process))]
+    [HarmonyPostfix]
+    private static void CartRotation(Bloon __instance)
+    {
 
+        if (__instance.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
+        {
+            if (__instance.GetUnityDisplayNode() != null)
+            {
+                __instance.Rotation += 225;
+            }
+        }
 
-    [HarmonyPatch(typeof(InGame), nameof(InGame.RoundStart))]
+    }
+        
+        [HarmonyPatch(typeof(InGame), nameof(InGame.RoundStart))]
     [HarmonyPostfix]
     private static void SpawnCarts()
     {

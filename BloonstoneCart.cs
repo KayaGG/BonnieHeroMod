@@ -31,7 +31,7 @@ namespace BonnieHeroMod;
 [HarmonyPatch]
 public class BloonstoneCart : ModBloon
 {
-    public override string BaseBloon => BloonType.Moab;
+    public override string BaseBloon => BloonType.Red;
     public override string Name => "BloonstoneCart";
     public override void ModifyBaseBloonModel(BloonModel bloonModel)
     {
@@ -41,6 +41,8 @@ public class BloonstoneCart : ModBloon
         bloonModel.tags = new string[] {"NA"};
         bloonModel.leakDamage = 0;
         bloonModel.maxHealth = 4;
+        bloonModel.isMoab = true;
+        bloonModel.disallowCosmetics = true;
         bloonModel.RemoveAllChildren();
         bloonModel.AddBehavior(badImmunity);
         //bloonModel.GetBehavior<DistributeCashModel>().cash = 50;
@@ -51,7 +53,7 @@ public class BloonstoneCart : ModBloon
     public class CartDegradeManager
     {
         [HarmonyPostfix]
-        private static void BloonDegradePostfix(Bloon bloon)
+        private static void BloonDestroyPostfix(Bloon bloon)
         {
             if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
             {
@@ -128,6 +130,8 @@ public class BloonstoneCart : ModBloon
 
                 projectile.EmittedBy = bonnieHero;
                 projectile.lifespan = 999999;
+
+                //bloon.Destroy();
             }
         }
     }

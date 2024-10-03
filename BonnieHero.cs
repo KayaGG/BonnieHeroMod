@@ -34,7 +34,7 @@ using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Attack;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using Il2CppSystem.Dynamic.Utils;
+
 using Il2CppAssets.Scripts.Models.Towers.Weapons;
 
 namespace BonnieHeroMod;
@@ -66,6 +66,8 @@ public class BonnieHero : ModHero
         var explosion = Game.instance.model.GetTower("BombShooter").GetWeapon().projectile.GetBehavior<CreateProjectileOnContactModel>().Duplicate();
         var explosionSound = Game.instance.model.GetTower("BombShooter").GetWeapon().projectile.GetBehavior<CreateSoundOnProjectileCollisionModel>().Duplicate();
 
+
+
         towerModel.mods = quincy.mods;
         towerModel.ApplyDisplay<BonnieDisplay>();
         towerModel.GetBehavior<DisplayModel>().display = towerModel.display;
@@ -93,6 +95,8 @@ public class BonnieHero : ModHero
         projectile.AddBehavior(explosionSound);
 
         projectile.AddBehavior(Game.instance.model.GetTower("MortarMonkey").GetWeapon().projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>().Duplicate());
+        projectile.display = new PrefabReference("4bce3e766a25dc74085e2427d1db6160");
+        projectile.RemoveBehavior<SetSpriteFromPierceModel>();
         var effectOnExpire = projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>();
         var effectOnExhaust = new CreateEffectOnExhaustedModel("CreateEffectOnExhaustedModel_", effectOnExpire.assetId,
             effectOnExpire.lifespan, effectOnExpire.fullscreen, effectOnExpire.randomRotation,

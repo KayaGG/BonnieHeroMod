@@ -40,15 +40,14 @@ namespace BonnieHeroMod
         {
             var badImmunity = Game.instance.model.GetBloon("Bad").GetBehavior<BadImmunityModel>().Duplicate();
 
-            bloonModel.SetDisplayGUID("6f2f238e52bdbe048b582029f4ea01b7");
+            bloonModel.SetDisplayGUID("cf38e0e2f5778e742a65aa7d854e3b15");
 
             bloonModel.leakDamage = 0;
             bloonModel.speed = 90f;
             bloonModel.maxHealth = 4000;
             bloonModel.disallowCosmetics = true;
             bloonModel.dontShowInSandbox = true;
-            //bloonModel.RemoveTag("Moab");
-            //bloonModel.RemoveTag("Moabs");
+          
             bloonModel.RemoveAllChildren();
             bloonModel.RemoveBehavior<DamageStateModel>();
             bloonModel.damageDisplayStates = bloonModel.damageDisplayStates.Empty();
@@ -165,6 +164,16 @@ namespace BonnieHeroMod
 
                 var collisionState = InGame.instance.bridge.Simulation.collisionChecker.GetInRange<Bloon>(__instance.Position.X, __instance.Position.Y, 12);
 
+                if (__instance.baseScale == 1)
+                {
+
+                    __instance.baseScale = 0.8f;
+                }
+                if (__instance.GetUnityDisplayNode() != null)
+                {
+                    __instance.Rotation += 90;
+                }
+
                 if (collisionState == null)
                     return;
 
@@ -187,6 +196,8 @@ namespace BonnieHeroMod
                             moabStunDuration = 6;
                             break;
                     }
+
+                    
 
                     var slowMutator = new SlowModel.SlowMutator(0, "Stun:BEASTStun", "SniperStun", true, false, 0);
 

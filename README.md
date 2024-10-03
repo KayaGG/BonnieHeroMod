@@ -6,14 +6,11 @@
 Bonnie Hero Mod
 </h1>
 
-A project aiming to port Bonnie from BTD Battles 2 over to BTD 6 and make rebalance her for the different environment.
+A project aiming to port Bonnie from BTD Battles 2 over to BTD 6 and make rebalance her for the different environment. Made with help of GrahamKracker & DatJaneDoe.
 
 KNOWN BUGS:
+* UI Initialization fails under certain circumstances
 
-Embrittlement / Super Brittle cause BEAST to not drop full value
-
-UI Initialization fails under certain circumstances
-
-Please still report both of these WITH DETAILS
+Please still report these WITH DETAILS
 
 [![Requires BTD6 Mod Helper](https://raw.githubusercontent.com/gurrenm3/BTD-Mod-Helper/master/banner.png)](https://github.com/gurrenm3/BTD-Mod-Helper#readme)

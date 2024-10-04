@@ -104,6 +104,10 @@ public class BloonstoneCart : ModBloon
                 cashProjectile.GetBehavior<CashModel>().minimum = cartWorth;
                 cashProjectile.GetBehavior<CashModel>().maximum = cartWorth;
 
+                var ageModel = new AgeModel("BloonstoneCash_AgeModel", 999999f, 999999, true, null);
+
+                cashProjectile.AddBehavior(ageModel);
+
                 var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(
                     cashProjectile);
                 var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
@@ -130,6 +134,8 @@ public class BloonstoneCart : ModBloon
 
                 projectile.EmittedBy = bonnieHero;
                 projectile.lifespan = 999999;
+
+                
 
                 //bloon.Destroy();
             }

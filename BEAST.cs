@@ -92,6 +92,10 @@ namespace BonnieHeroMod
                 cashProjectile.GetBehavior<CashModel>().minimum = worth;
                 cashProjectile.GetBehavior<CashModel>().maximum = worth;
 
+                var ageModel = new AgeModel("BloonstoneCash_AgeModel", 999999f, 999999, true, null);
+
+                cashProjectile.AddBehavior(ageModel);
+
                 var projectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(
                     cashProjectile);
                 var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();

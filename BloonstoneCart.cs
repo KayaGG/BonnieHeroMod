@@ -41,6 +41,7 @@ public class BloonstoneCart : ModBloon
         bloonModel.tags = new string[] {"NA"};
         bloonModel.leakDamage = 0;
         bloonModel.maxHealth = 4;
+        bloonModel.speed = 50f;
         bloonModel.isMoab = true;
         bloonModel.disallowCosmetics = true;
         bloonModel.RemoveAllChildren();
@@ -206,7 +207,7 @@ public class BloonstoneCart : ModBloon
 
     }
         
-        [HarmonyPatch(typeof(InGame), nameof(InGame.RoundStart))]
+    [HarmonyPatch(typeof(InGame), nameof(InGame.RoundStart))]
     [HarmonyPostfix]
     private static void SpawnCarts()
     {
@@ -215,7 +216,7 @@ public class BloonstoneCart : ModBloon
         {
             if (bonnieHero.towerModel.tier > 0)
             {
-                InGame.instance.SpawnBloons(ModContent.BloonID<BloonstoneCart>(), 3, 360);
+                InGame.instance.SpawnBloons(ModContent.BloonID<BloonstoneCart>(), 3, 480);
             }
         }
     }

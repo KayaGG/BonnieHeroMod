@@ -49,6 +49,10 @@ public class BonnieHero : ModHero
     public override string Title => "Bloonstone Miner";
     public override string Description => "A hard working miner who summons carts of Bloonstones for extra cash. Her dynamite makes short work of any Bloon that passes by.";
     public override string Level1Description => "A hard working miner who summons carts of Bloonstones for extra cash. Her dynamite makes short work of any Bloon that passes by.";
+    public override string Icon => "BonnieHero-Icon";
+    public override string Portrait => "BonnieHero-Portrait";
+    public override string Square => "BonnieHero-Square";
+    public override string Button => "BonnieHero-Button";
 
     public override string NameStyle => TowerType.Gwendolin;
     public override string BackgroundStyle => TowerType.Gwendolin;
@@ -149,6 +153,8 @@ public class BonnieHero : ModHero
             public override string AbilityName => "Mass Detonation";
 
             public override string AbilityDescription => "Bonnie throws dynamite at every minecart at once, destroying them and any bloons around them.";
+
+            public override string Portrait => "BonnieHeroL3-Portrait";
 
             public override string Description => "Mass Detonation - Bonnie throws dynamite at every minecart at once, destroying them and any bloons around them.";
             public override int Level => 3;
@@ -333,6 +339,8 @@ public class BonnieHero : ModHero
 
             public override string AbilityDescription => "Calls forth the Bloonstone Excavation And Supply Truck which stuns bloons by running them over. Continually drops bloonstones as it takes damage from monkey attacks.";
 
+            public override string Portrait => "BonnieHeroL10-Portrait";
+
             public override string Description => "B.E.A.S.T. - Calls forth the Bloonstone Excavation And Supply Truck which stuns bloons by running them over. Continually drops bloonstones as it takes damage from monkey attacks.";
             public override int Level => 10;
             public override void ApplyUpgrade(TowerModel towerModel)
@@ -507,6 +515,7 @@ public class BonnieHero : ModHero
         public class Level20 : ModHeroLevel<BonnieHero>
         {
             public override string Description => "The B.E.A.S.T. carries even more valuable bloonstones and stuns bloons for even longer. Minecarts can be upgraded to their maximum value of $12,000 per cart.";
+            public override string Portrait => "BonnieHeroL20-Portrait";
             public override int Level => 20;
             public override void ApplyUpgrade(TowerModel towerModel)
             {

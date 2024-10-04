@@ -74,18 +74,18 @@ namespace BonnieHeroMod
                 var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile.Duplicate();
                 cashProjectile.RemoveBehavior<AgeModel>();
 
-                var worth = 50f;
+                var worth = 25f;
 
                 switch (bonnieHero.towerModel.tier)
                 {
                     case < 16:
-                        worth = 50f;
+                        worth = 25f;
                         break;
                     case < 20:
-                        worth = 100f;
+                        worth = 50f;
                         break;
                     case 20:
-                        worth = 200f;
+                        worth = 100f;
                         break;
                 }
 

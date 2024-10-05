@@ -1,41 +1,17 @@
-using UnityEngine;
-using BTD_Mod_Helper.Api;
 using BTD_Mod_Helper.Api.Towers;
 using BTD_Mod_Helper.Extensions;
 using HarmonyLib;
-using Il2CppAssets.Scripts.Models.Bloons;
 using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Attack.Behaviors;
-using Il2CppAssets.Scripts.Models.Towers.Projectiles;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
-using Il2CppAssets.Scripts.Simulation.Bloons;
-using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Unity;
-using Il2CppAssets.Scripts.Unity.UI_New.InGame;
-using MelonLoader;
-using System.Linq;
-using Il2CppAssets.Scripts.Utils;
 using Il2CppAssets.Scripts.Models.GenericBehaviors;
 using Il2CppNinjaKiwi.Common.ResourceUtils;
 using BTD_Mod_Helper.Api.Display;
 using Il2CppAssets.Scripts.Unity.Display;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors;
-using Il2CppAssets.Scripts.Models.Towers.Mods;
-using UnityEngine.UI;
-using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu.TowerSelectionMenuThemes;
-using Il2CppAssets.Scripts.Unity.Bridge;
-using static MelonLoader.MelonLogger;
-using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
-using static BonnieHeroMod.BonnieHeroMod;
 using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
 using Il2CppAssets.Scripts.Models;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities;
-using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors.Attack;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
-
-using Il2CppAssets.Scripts.Models.Towers.Weapons;
 
 namespace BonnieHeroMod;
 

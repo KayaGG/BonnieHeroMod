@@ -1,20 +1,18 @@
 ﻿using BTD_Mod_Helper.Api.Components;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
-using MelonLoader;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using BTD_Mod_Helper.Extensions;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using BTD_Mod_Helper.Api;
 using BTD_Mod_Helper.Api.Enums;
+using HarmonyLib;
+using BTD_Mod_Helper.Api.Helpers;
+
 
 namespace BonnieHeroMod
 {
-
+    [HarmonyPatch]
     //todo fix ui init edgecase bugs
     public class BonnieLogic
     {
@@ -28,7 +26,6 @@ namespace BonnieHeroMod
             public static ModHelperText upgradeText;
             public static ModHelperButton cartSell;
             public static ModHelperText sellText;
-
 
             public static void Init(TowerSelectionMenu tsm)
             {
@@ -45,6 +42,7 @@ namespace BonnieHeroMod
                                 bonniePanel = TowerSelectionMenu.instance.themeManager.currentTheme.gameObject.AddModHelperPanel(new Info("BonniePanel", InfoPreset.FillParent));
 
                                 var cartWorth = 25f;
+
 
                                 for (int i = 0; i < menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier; i++)
                                 {
@@ -84,7 +82,7 @@ namespace BonnieHeroMod
                                     {
                                         CartUpgradeLogic();
                                     }));
-                                upgradeText = cartUpgrade.AddText(new Info("CartUpgradeText", 0, 5, 300, 145), "Upgrade \n(" + 240 + ")");
+                                upgradeText = cartUpgrade.AddText(new Info("CartUpgradeText", 0, 5, 300, 145), "Upgrade \n(" + 0 + ")");
 
                                 cartSell = bonniePanel.AddButton(new Info("CartSell", 225, -580, 300, 145), VanillaSprites.RedBtnLong,
                                     new System.Action(() =>
@@ -106,8 +104,10 @@ namespace BonnieHeroMod
                 {
                     if (TowerSelectionMenu.instance.selectedTower.tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
                     {
-                        var nextUpgradePrice = 0f;
+                        var nextUpgradePrice = 0;
                         var cartWorth = 25f;
+                        var gameModel = InGame.instance.GetGameModel();
+                        var mods = InGame.instance.GetGameModel().AllMods.ToIl2CppList();
 
                         for (int i = 0; i < menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier; i++)
                         {
@@ -143,28 +143,28 @@ namespace BonnieHeroMod
                         switch (menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().multiplier + 1)
                         {
                             case <= 5:
-                                nextUpgradePrice = 300f;
+                                nextUpgradePrice = CostHelper.CostForDifficulty(300, mods);
                                 break;
                             case <= 10:
-                                nextUpgradePrice = 1000f;
+                                nextUpgradePrice = CostHelper.CostForDifficulty(1000, mods);
                                 break;
                             case <= 15:
-                                nextUpgradePrice = 2700f;
+                                nextUpgradePrice = CostHelper.CostForDifficulty(2700, mods);
                                 break;
                             case <= 20:
-                                nextUpgradePrice = 4800f;
+                                nextUpgradePrice = CostHelper.CostForDifficulty(4800, mods);
                                 break;
                             case <= 25:
-                                nextUpgradePrice = 8800f;
+                                nextUpgradePrice = CostHelper.CostForDifficulty(8800, mods);
                                 break;
                             case <= 30:
-                                nextUpgradePrice = 13000f;
+                                nextUpgradePrice = CostHelper.CostForDifficulty(13000, mods);
                                 break;
                             case <= 35:
-                                nextUpgradePrice = 21000f;
+                                nextUpgradePrice = CostHelper.CostForDifficulty(21000, mods);
                                 break;
                             case <= 40:
-                                nextUpgradePrice = 29000f;
+                                nextUpgradePrice = CostHelper.CostForDifficulty(29000, mods);
                                 break;
                         }
 
@@ -194,7 +194,9 @@ namespace BonnieHeroMod
         public static void CartUpgradeLogic()
         {
             var towerLogic = BonnieUI.menu.selectedTower.tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
-            var currentUpgradePrice = 0f;
+            var currentUpgradePrice = 0;
+            var gameModel = InGame.instance.GetGameModel();
+            var mods = InGame.instance.GetGameModel().AllMods.ToIl2CppList();
 
             if (towerLogic.multiplier < towerLogic.glueLevel)
             {
@@ -202,28 +204,28 @@ namespace BonnieHeroMod
                 switch (towerLogic.multiplier)
                 {
                     case < 5:
-                        currentUpgradePrice = 300f;
+                        currentUpgradePrice = CostHelper.CostForDifficulty(300, mods); 
                         break;
                     case < 10:
-                        currentUpgradePrice = 1000f;
+                        currentUpgradePrice = CostHelper.CostForDifficulty(1000, mods);
                         break;
                     case < 15:
-                        currentUpgradePrice = 2700f;
+                        currentUpgradePrice = CostHelper.CostForDifficulty(2700, mods);
                         break;
                     case < 20:
-                        currentUpgradePrice = 4800f;
+                        currentUpgradePrice = CostHelper.CostForDifficulty(4800, mods);
                         break;
                     case < 25:
-                        currentUpgradePrice = 8800f;
+                        currentUpgradePrice = CostHelper.CostForDifficulty(8800, mods);
                         break;
                     case < 30:
-                        currentUpgradePrice = 13000f;
+                        currentUpgradePrice = CostHelper.CostForDifficulty(13300, mods);
                         break;
                     case < 35:
-                        currentUpgradePrice = 21000f;
+                        currentUpgradePrice = CostHelper.CostForDifficulty(21000, mods);
                         break;
                     case < 40:
-                        currentUpgradePrice = 29000f;
+                        currentUpgradePrice = CostHelper.CostForDifficulty(29000, mods);
                         break;
                 }
 
@@ -231,7 +233,7 @@ namespace BonnieHeroMod
                 {
                     InGame.instance.SetCash(InGame.instance.GetCash() - currentUpgradePrice);
                     towerLogic.multiplier++; //upgrade cart tier by 1
-                    towerLogic.additive += currentUpgradePrice * 0.7f; //add cash to "bank"
+                    towerLogic.additive += (float)Math.Floor(currentUpgradePrice * 0.7); //add cash to "bank"
 
                     BonnieUI.UpdateUI();
                 }

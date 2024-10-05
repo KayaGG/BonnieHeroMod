@@ -3,7 +3,6 @@ using BTD_Mod_Helper.Api.Bloons;
 using BTD_Mod_Helper.Api.Enums;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Models.Bloons;
-using Il2CppAssets.Scripts.Models.Towers;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles;
 using Il2CppAssets.Scripts.Models.Towers.Weapons;
@@ -12,19 +11,11 @@ using Il2CppAssets.Scripts.Unity.UI_New.InGame;
 using MelonLoader;
 using BTD_Mod_Helper.Extensions;
 using Il2CppAssets.Scripts.Unity;
-using Il2CppAssets.Scripts.Simulation.Towers.Projectiles;
 using Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Behaviors;
-using Il2CppAssets.Scripts.Simulation.SMath;
 using UnityEngine;
 using Il2CppAssets.Scripts.Simulation.Towers;
-using Il2CppAssets.Scripts.Simulation.Track.RoundManagers;
-using Il2CppAssets.Scripts.Utils;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
-using static MelonLoader.MelonLogger;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
-using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
-using Il2CppAssets.Scripts.Unity.Towers.Projectiles;
-using Il2CppAssets.Scripts.Simulation.Bloons.Behaviors;
 
 namespace BonnieHeroMod;
 
@@ -146,7 +137,7 @@ public class BloonstoneCart : ModBloon
 
         
         
-        [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonSpawned))]
+    [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonSpawned))]
     [HarmonyPrefix]
     private static void Bloon_Spawn(Bloon bloon)
     {
@@ -206,7 +197,9 @@ public class BloonstoneCart : ModBloon
         }
 
     }
-        
+
+    //[HarmonyPatch(typeof(ModifyTowerCashModModel), nameof(ModifyTowerCashModModel.))]
+
     [HarmonyPatch(typeof(InGame), nameof(InGame.RoundStart))]
     [HarmonyPostfix]
     private static void SpawnCarts()

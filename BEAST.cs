@@ -2,10 +2,6 @@
 using BTD_Mod_Helper.Api.Enums;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
 using Il2CppAssets.Scripts.Models.Bloons;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Il2CppAssets.Scripts.Unity;
 using BTD_Mod_Helper.Extensions;
 using HarmonyLib;
@@ -13,18 +9,13 @@ using Il2CppAssets.Scripts.Simulation.Bloons;
 using MelonLoader;
 using BTD_Mod_Helper.Api;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
-using Il2CppAssets.Scripts.Models.GenericBehaviors;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Bloons.Behaviors;
-using Il2CppAssets.Scripts.Simulation.Towers.Emissions;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors.Emissions;
 using Il2CppAssets.Scripts.Models.Towers.Weapons;
 using Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Behaviors;
 using UnityEngine;
 using Il2CppAssets.Scripts.Simulation.Towers;
-using Il2CppAssets.Scripts.Simulation.SMath;
-using UnityEngine.UIElements;
 
 namespace BonnieHeroMod
 {

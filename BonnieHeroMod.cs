@@ -6,43 +6,15 @@ using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Simulation.Objects;
 using Il2CppAssets.Scripts.Models;
 using Il2CppAssets.Scripts.Models.Towers;
-using Il2CppAssets.Scripts.Unity;
 using BTD_Mod_Helper.Extensions;
-using BTD_Mod_Helper.Api.Towers;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
-using Il2CppAssets.Scripts.Models.Towers.Weapons;
-using Il2CppAssets.Scripts.Simulation.Bloons;
-using Il2CppAssets.Scripts.Simulation.Towers.Projectiles;
-using Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Behaviors;
-using Il2CppAssets.Scripts.Unity.Towers.Weapons;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
-using UnityEngine;
-using Vector3 = Il2CppAssets.Scripts.Simulation.SMath.Vector3;
-using Il2CppAssets.Scripts.Simulation.Track.RoundManagers;
-using Il2CppAssets.Scripts.Unity.Bridge;
-using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu.TowerSelectionMenuThemes;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
-using BTD_Mod_Helper.Api.Components;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
-using static BTD_Mod_Helper.Api.Enums.VanillaSprites;
-using BTD_Mod_Helper.Api.Enums;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities.Behaviors;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors;
-using Il2CppAssets.Scripts.Models.GenericBehaviors;
-using static Il2CppAssets.Scripts.Utils.ObjectCache;
-using Il2CppAssets.Scripts.Data;
 using Il2CppAssets.Scripts.Models.Profile;
-using Il2CppAssets.Scripts.Simulation;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
-using Il2CppAssets.Scripts.Models.Towers.Behaviors.Abilities;
-using Il2CppAssets.Scripts.Models.Effects;
-using Il2CppAssets.Scripts.Unity.Effects;
-using static MelonLoader.MelonLogger;
-using Il2CppSystem;
-using System.Collections.Generic;
-using Il2CppAssets.Scripts.Unity.Towers.Projectiles;
 
 [assembly: MelonInfo(typeof(BonnieHeroMod.BonnieHeroMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
@@ -213,7 +185,6 @@ public class BonnieHeroMod : BloonsTD6Mod
                                 var attackModel = bonnieHero.towerModel.GetAttackModel();
                                 var dynamite = attackModel.weapons[0].projectile;
                                 var explosion = dynamite.GetBehavior<CreateProjectileOnContactModel>().projectile;
-                                //var explosionEffect = Game.instance.model.GetTower("MortarMonkey").GetWeapon().projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>().Duplicate();
 
                                 var cartExplosionProjectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(explosion);
 
@@ -243,21 +214,3 @@ public class BonnieHeroMod : BloonsTD6Mod
         base.OnRoundStart();
     }
 }
-
-//Code by doombubbles
-/*[HarmonyPatch(typeof(TSMThemeBananaFarm), nameof(TSMThemeBananaFarm.UpdateFromSimInfo))]
-internal static class TSMThemeBananaFarm_UpdateFromSimInfo
-{
-    [HarmonyPrefix]
-    internal static void Prefix(TowerToSimulation tower, ref int __state)
-    {
-        __state = tower.Def.tiers[1];
-        tower.Def.tiers[1] = 4;
-    }
-
-    [HarmonyPostfix]
-    internal static void Postfix(TSMThemeBananaFarm __instance, TowerToSimulation tower, ref int __state)
-    {
-        tower.Def.tiers[1] = __state;
-    }
-}*/

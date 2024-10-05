@@ -10,6 +10,7 @@ A project aiming to port Bonnie from BTD Battles 2 over to BTD 6 and make rebala
 
 KNOWN BUGS:
 * UI Initialization fails under certain circumstances
+* Logic fails to initialize when playing CHIMPS, non issue as her main purpose is cash income, which is disabled in CHIMPS
 
 Please still report these WITH DETAILS
 

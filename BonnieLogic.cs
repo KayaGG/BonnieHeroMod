@@ -13,7 +13,7 @@ using BTD_Mod_Helper.Api.Helpers;
 namespace BonnieHeroMod
 {
     [HarmonyPatch]
-    //todo fix ui init edgecase bugs
+    //todo fix ui init edgecase bugs, carts retain value but UI does not initialize properly
     public class BonnieLogic
     {
         public class BonnieUI

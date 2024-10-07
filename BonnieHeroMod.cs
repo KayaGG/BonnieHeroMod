@@ -14,9 +14,13 @@ using Il2CppAssets.Scripts.Unity.UI_New.InGame;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
 using Il2CppAssets.Scripts.Models.Profile;
+using Il2CppAssets.Scripts.Simulation.Bloons;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
+using Il2CppAssets.Scripts.Unity;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame.RightMenu;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame.StoreMenu;
 
-[assembly: MelonInfo(typeof(BonnieHeroMod.BonnieHeroMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
+[assembly: MelonInfo(typeof(BonnieHeroMod.BonnieHeroMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.Author)]
 [assembly: MelonGame("Ninja Kiwi", "BloonsTD6")]
 
 namespace BonnieHeroMod;
@@ -24,42 +28,42 @@ namespace BonnieHeroMod;
 [HarmonyPatch]
 public class BonnieHeroMod : BloonsTD6Mod
 {
+    public Tower? PlacedBonnie = null;
     public override void OnTowerUpgraded(Tower tower, string upgradeName, TowerModel newBaseTowerModel)
     {
-        base.OnTowerUpgraded(tower, upgradeName, newBaseTowerModel);
+
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
         {
-            var towerLogic = tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
+            tower.GetBonnieData(out var towerLogic);
             switch (tower.towerModel.tier)
             {
                 case 2:
-                    BonnieLogic.BonnieUI.Init(TowerSelectionMenu.instance);
-                    tower.AddMutator(new RangeSupport.MutatorTower(false, "MinecartTier", 0, 0, null));
-                    tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().glueLevel = 10;
+                   // tower.AddMutator(new RangeSupport.MutatorTower(false, MutatorName, 0, 0, null));
+                    //tower.GetBonnieData().glueLevel = 10; //todo
                     break;
                 case 5:
-                    towerLogic.glueLevel = 15;
-                    BonnieLogic.BonnieUI.UpdateUI();
+                    towerLogic.MaxTier = 15;
+                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 8:
-                    towerLogic.glueLevel = 20;
-                    BonnieLogic.BonnieUI.UpdateUI();
+                    towerLogic.MaxTier = 20;
+                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 11:
-                    towerLogic.glueLevel = 25;
-                    BonnieLogic.BonnieUI.UpdateUI();
+                    towerLogic.MaxTier = 25;
+                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 14:
-                    towerLogic.glueLevel = 30;
-                    BonnieLogic.BonnieUI.UpdateUI();
+                    towerLogic.MaxTier = 30;
+                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 17:
-                    towerLogic.glueLevel = 35;
-                    BonnieLogic.BonnieUI.UpdateUI();
+                    towerLogic.MaxTier = 35;
+                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 20:
-                    towerLogic.glueLevel = 40;
-                    BonnieLogic.BonnieUI.UpdateUI();
+                    towerLogic.MaxTier = 40;
+                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
             }
         }
@@ -67,14 +71,13 @@ public class BonnieHeroMod : BloonsTD6Mod
 
     public override void OnTowerCreated(Tower tower, Entity target, Model modelToUse)
     {
-        base.OnTowerCreated(tower, target, modelToUse);
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
         {
+            PlacedBonnie = tower;
             if (tower.towerModel.tier > 0)
             {
-                BonnieLogic.BonnieUI.Init(TowerSelectionMenu.instance);
-                tower.AddMutator(new RangeSupport.MutatorTower(false, "MinecartTier", 0, 0, null));
-                tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>().glueLevel = 10;
+                var towerLogic = tower.GetOrCreateBonnieData();
+                tower.SaveBonnieData(towerLogic);
             }
         }
     }
@@ -87,52 +90,29 @@ public class BonnieHeroMod : BloonsTD6Mod
         {
             if (tower.towerModel.tier > 0)
             {
-                var towerLogic = tower.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
-                BonnieLogic.CartSellLogic();
-                towerLogic.glueLevel = 10;
+                if (tower.GetBonnieData(out var towerLogic))
+                {
+                    BonnieLogic.CartSellLogic();
+                    towerLogic.MaxTier = 10;
+                }
             }
+            PlacedBonnie = null;
         }
     }
 
-
-    public override void OnTowerSelected(Tower tower)
-    {
-        base.OnTowerSelected(tower);
-        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
-        {
-            if (BonnieLogic.BonnieUI.bonniePanel != null)
-            {
-                BonnieLogic.BonnieUI.BonnieUIToggle(true);
-            }
-            else
-            {
-                BonnieLogic.BonnieUI.Init(TowerSelectionMenu.instance);
-            }
-        }
-    }
-
-    public override void OnTowerDeselected(Tower tower)
-    {
-        base.OnTowerDeselected(tower);
-        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
-        {
-            if (BonnieLogic.BonnieUI.bonniePanel != null)
-            {
-                BonnieLogic.BonnieUI.BonnieUIToggle(false);
-            }
-        }
-    }
     public override void OnTowerSaved(Tower tower, TowerSaveDataModel saveData)
     {
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
         {
-            var MinecartTier = tower.GetMutator("MinecartTier")?.TryCast<RangeSupport.MutatorTower>();
-            if (MinecartTier != null)
-            {
-                saveData.metaData["MinecartTier"] = MinecartTier.multiplier.ToString();
-                saveData.metaData["MinecartTierBank"] = MinecartTier.additive.ToString();
-                saveData.metaData["MinecartMaxTier"] = MinecartTier.glueLevel.ToString();
-            }
+            // var MinecartTier = tower.GetMutator(MutatorName)?.TryCast<RangeSupport.MutatorTower>();
+            // if (MinecartTier != null)
+            // {
+            //     saveData.metaData[MutatorName] = MinecartTier.multiplier.ToString();
+            //     saveData.metaData["MinecartTierBank"] = MinecartTier.additive.ToString();
+            //     saveData.metaData["MinecartMaxTier"] = MinecartTier.glueLevel.ToString();
+            // } //todo
+
+            PlacedBonnie = null;
         }
     }
 
@@ -142,27 +122,45 @@ public class BonnieHeroMod : BloonsTD6Mod
         {
             if (tower.mutators != null)
             {
-                tower.RemoveMutatorsById("MinecartTier");
+                tower.RemoveMutatorsById(MutatorName);
 
-                saveData.metaData.TryGetValue("MinecartTier", out var minecartTier);
+                /*saveData.metaData.TryGetValue(MutatorName, out var minecartTier);
                 saveData.metaData.TryGetValue("MinecartTierBank", out var minecartTierBank);
                 saveData.metaData.TryGetValue("MinecartMaxTier", out var minecartMaxTier);
 
-                var minecartMutator = new RangeSupport.MutatorTower(false, "MinecartTier", float.Parse(minecartTierBank), float.Parse(minecartTier), null);
+                var minecartMutator = new RangeSupport.MutatorTower(false, MutatorName, float.Parse(minecartTierBank), float.Parse(minecartTier), null);
                 minecartMutator.glueLevel = int.Parse(minecartMaxTier);
-                tower.AddMutator(minecartMutator);
+                tower.AddMutator(minecartMutator);*/
+                //todo
             }
+            
+            PlacedBonnie = tower;
         }
     }
 
-    public override void OnAbilityCast(Ability ability)
+#if DEBUG
+    public override void OnMatchStart()
     {
-        base.OnAbilityCast(ability);
-        if (ability.abilityModel.name == "AbilityModel_MassDetonation")
+        string newHero = ModContent.TowerID<BonnieHero>();
+        var towerInventory = InGame.instance.GetTowerInventory();
+        var unlockedHeroes = Game.instance.GetPlayerProfile().unlockedHeroes;
+        foreach (var unlockedHero in unlockedHeroes)
         {
+            towerInventory.towerMaxes[unlockedHero] = 0;
+        }
 
+        towerInventory.towerMaxes[newHero] = 1;
+
+        var disallowSelectingDifferentTowers = ShopMenu.instance.disallowSelectingDifferentTowers;
+        ShopMenu.instance.disallowSelectingDifferentTowers = false;
+        ShopMenu.instance.RebuildTowerSet();
+        ShopMenu.instance.disallowSelectingDifferentTowers = disallowSelectingDifferentTowers;
+        foreach (var button in ShopMenu.instance.ActiveTowerButtons)
+        {
+            button.Cast<TowerPurchaseButton>().Update();
         }
     }
+#endif
 
     [HarmonyPatch(typeof(Ability), nameof(Ability.Activate))]
     public static class BonnieAbility
@@ -178,9 +176,9 @@ public class BonnieHeroMod : BloonsTD6Mod
                     var bloons = InGame.instance.GetBloons();
                     if (bloons != null)
                     {
-                        for (int i = 0; i < bloons.Count; i++)
+                        foreach (var bloon in bloons)
                         {
-                            if (bloons[i].bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
+                            if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
                             {
                                 var attackModel = bonnieHero.towerModel.GetAttackModel();
                                 var dynamite = attackModel.weapons[0].projectile;
@@ -188,29 +186,18 @@ public class BonnieHeroMod : BloonsTD6Mod
 
                                 var cartExplosionProjectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(explosion);
 
-                                cartExplosionProjectile.Position.X = bloons[i].Position.X;
-                                cartExplosionProjectile.Position.Y = bloons[i].Position.Y;
-                                cartExplosionProjectile.Position.Z = bloons[i].Position.Z;
+                                cartExplosionProjectile.Position.X = bloon.Position.X;
+                                cartExplosionProjectile.Position.Y = bloon.Position.Y;
+                                cartExplosionProjectile.Position.Z = bloon.Position.Z;
 
                                 cartExplosionProjectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
 
-                                bloons[i].Degrade(false, bonnieHero, false);
+                                bloon.Degrade(false, bonnieHero, false);
                             }
                         }
                     }
                 }
-                if (__instance.abilityModel.name == "AbilityModel_BEAST")
-                {
-                    InGame.instance.SpawnBloons(ModContent.BloonID<BEAST>(), 1, 0);
-
-                    var beast = InGame.instance.GetBloons().Find(bloon => bloon.bloonModel.baseId == ModContent.BloonID<BEAST>());
-                }
             }
         }
-    }
-
-    public override void OnRoundStart()
-    {
-        base.OnRoundStart();
     }
 }

@@ -53,9 +53,9 @@ namespace BonnieHeroMod
         [HarmonyPostfix]
         public static void BEAST_HPPostfix(HealthPercentTrigger __instance)
         {
-            if (__instance.bloon.bloonModel.baseId == ModContent.BloonID<BEAST>())
+            if (__instance.bloon.bloonModel.baseId == BloonID<BEAST>())
             {
-                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
                 if (bonnieHero == null)
                 {
                     MelonLogger.Error("bonnie is null");
@@ -120,9 +120,9 @@ namespace BonnieHeroMod
         [HarmonyPrefix]
         private static void Bloon_Spawn(Bloon bloon)
         {
-            if (bloon.bloonModel.baseId == ModContent.BloonID<BEAST>())
+            if (bloon.bloonModel.baseId == BloonID<BEAST>())
             {
-                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
                 if (bonnieHero == null)
                 {
                     MelonLogger.Error("bonnie is null");
@@ -148,9 +148,9 @@ namespace BonnieHeroMod
         [HarmonyPostfix]
         private static void BEASTStun(Bloon __instance)
         {
-            if (__instance.bloonModel.baseId == ModContent.BloonID<BEAST>())
+            if (__instance.bloonModel.baseId == BloonID<BEAST>())
             {
-                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
                 if (bonnieHero == null)
                 {
                     MelonLogger.Error("bonnie is null");

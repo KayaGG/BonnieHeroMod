@@ -74,32 +74,16 @@ public class BonnieHero : ModHero
         explosion.projectile.SetHitCamo(true);
         projectile.AddBehavior(explosionSound);
 
-        projectile.AddBehavior(Game.instance.model.GetTower("MortarMonkey").GetWeapon().projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>().Duplicate());
+        projectile.AddBehavior(Game.instance.model.GetTower("MortarMonkey").GetWeapon().projectile.GetBehavior<CreateEffectOnExpireModel>().Duplicate());
         projectile.display = new PrefabReference("4bce3e766a25dc74085e2427d1db6160");
         projectile.RemoveBehavior<SetSpriteFromPierceModel>();
-        var effectOnExpire = projectile.GetBehavior<Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors.CreateEffectOnExpireModel>();
+        var effectOnExpire = projectile.GetBehavior<CreateEffectOnExpireModel>();
         var effectOnExhaust = new CreateEffectOnExhaustedModel("CreateEffectOnExhaustedModel_", effectOnExpire.assetId,
             effectOnExpire.lifespan, effectOnExpire.fullscreen, effectOnExpire.randomRotation,
             effectOnExpire.effectModel);
         explosion.projectile.AddBehavior(effectOnExhaust);
     }
 
-    [HarmonyPatch(typeof(RangeSupport.MutatorTower), nameof(RangeSupport.MutatorTower.Mutate))]
-    internal static class RangeSupport_MutatorTower_Mutate
-    {
-        [HarmonyPrefix]
-        private static bool Prefix(RangeSupport.MutatorTower __instance, Model model, ref bool __result)
-        {
-            
-            if (__instance.id == "MinecartTier")
-            {
-                __result = true;
-                return false;
-            }
-
-            return true;
-        }
-    }
 
     public class Levels
     {

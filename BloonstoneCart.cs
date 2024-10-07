@@ -37,8 +37,6 @@ public class BloonstoneCart : ModBloon
         bloonModel.disallowCosmetics = true;
         bloonModel.RemoveAllChildren();
         bloonModel.AddBehavior(badImmunity);
-        //bloonModel.GetBehavior<DistributeCashModel>().cash = 50;
-        //bloonModel.GetBehavior<CarryProjectileModel>().projectile = farm.GetWeapon().projectile.Duplicate();
     }
 
     [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonDegrade))]
@@ -47,21 +45,21 @@ public class BloonstoneCart : ModBloon
         [HarmonyPostfix]
         private static void BloonDestroyPostfix(Bloon bloon)
         {
-            if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
+            if (bloon.bloonModel.baseId == BloonID<BloonstoneCart>())
             {
-                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
-                if (bonnieHero == null)
+                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
+                if (bonnieHero == null || !bonnieHero.GetBonnieData(out var towerLogic))
                 {
                     MelonLogger.Error("bonnie is null");
                     return;
                 }
-                var towerLogic = bonnieHero.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
+
                 var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile.Duplicate();
                 cashProjectile.RemoveBehavior<AgeModel>();
 
                 var cartWorth = 25f;
 
-                for (int i = 0; i < towerLogic.multiplier; i++)
+                for (int i = 0; i < towerLogic.CurrentTier; i++)
                 {
                     switch (i)
                     {
@@ -133,25 +131,21 @@ public class BloonstoneCart : ModBloon
             }
         }
     }
-  
 
-        
-        
+
     [HarmonyPatch(typeof(BloonManager), nameof(BloonManager.BloonSpawned))]
     [HarmonyPrefix]
     private static void Bloon_Spawn(Bloon bloon)
     {
-        if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
+        if (bloon.bloonModel.baseId == BloonID<BloonstoneCart>())
         {
-            var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
-            if (bonnieHero == null)
+            var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
+            if (bonnieHero == null || !bonnieHero.GetBonnieData(out var towerLogic))
             {
-                MelonLogger.Error("bonnie is null");
                 return;
             }
-            var towerLogic = bonnieHero.GetMutator("MinecartTier").Cast<RangeSupport.MutatorTower>();
 
-            for (int i = 0; i < towerLogic.multiplier; i++)
+            for (int i = 0; i < towerLogic.CurrentTier; i++)
             {
                 switch (i)
                 {
@@ -183,33 +177,31 @@ public class BloonstoneCart : ModBloon
             }
         }
     }
+
     [HarmonyPatch(typeof(Bloon), nameof(Bloon.Process))]
     [HarmonyPostfix]
     private static void CartRotation(Bloon __instance)
     {
-
-        if (__instance.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
+        if (__instance.bloonModel.baseId == BloonID<BloonstoneCart>())
         {
             if (__instance.GetUnityDisplayNode() != null)
             {
                 __instance.Rotation += 225;
             }
         }
-
     }
 
-    //[HarmonyPatch(typeof(ModifyTowerCashModModel), nameof(ModifyTowerCashModModel.))]
 
     [HarmonyPatch(typeof(InGame), nameof(InGame.RoundStart))]
     [HarmonyPostfix]
-    private static void SpawnCarts()
+    private static void InGame_RoundStart()
     {
-        var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
+        var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
         if (bonnieHero != null)
         {
             if (bonnieHero.towerModel.tier > 0)
             {
-                InGame.instance.SpawnBloons(ModContent.BloonID<BloonstoneCart>(), 3, 480);
+                InGame.instance.SpawnBloons(BloonID<BloonstoneCart>(), 3, 480);
             }
         }
     }

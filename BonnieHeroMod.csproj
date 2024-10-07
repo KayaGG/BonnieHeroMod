@@ -1,17 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <RootNamespace>BonnieHeroMod</RootNamespace>
         <Configurations>Debug;Release</Configurations>
+        <RootNamespace>BonnieHeroMod</RootNamespace>
         <Nullable>enable</Nullable>
         <AssemblyName>BonnieHeroMod</AssemblyName>
         <LangVersion>latest</LangVersion>
-        <Optimize>False</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <Optimize>false</Optimize>
         <DebugType>embedded</DebugType>
     </PropertyGroup>
-    <ItemGroup>
-      <None Remove="BonnieHeroMod.zip" />
-    </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <Optimize>true</Optimize>
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+
     <ItemGroup>
         <Content Include=".github\workflows\build.yml" />
     </ItemGroup>

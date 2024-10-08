@@ -14,7 +14,7 @@ public static class Extensions
             return false;
         }
 
-        var mutator = tower.GetMutator(MutatorName).Cast<SupportRemoveFilterOutTag.MutatorTower>();
+        var mutator = tower.GetMutator(MutatorName)?.Cast<SupportRemoveFilterOutTag.MutatorTower>();
 
         if (mutator is null)
         {
@@ -26,27 +26,22 @@ public static class Extensions
         return true;
     }
 
-    public static BonnieData GetOrCreateBonnieData(this Tower tower)
+    public static void CreateBonnieData(this Tower tower, BonnieData bonnieData = default)
     {
-        if (tower.GetBonnieData(out var data))
-        {
-            return data;
-        }
-
-        var newData = new BonnieData();
-        tower.AddMutator(new SupportRemoveFilterOutTag.MutatorTower(MutatorName, newData.ToJson(), null));
-        return newData;
+        var mutator = tower.GetMutator(MutatorName)?.TryCast<SupportRemoveFilterOutTag.MutatorTower>();
+        if (mutator is null)
+            tower.AddMutator(new SupportRemoveFilterOutTag.MutatorTower(MutatorName, bonnieData.ToJson(), null));
+        else
+            mutator.removeScriptsWithSupportMutatorId = bonnieData.ToJson();
     }
 
     public static void SetBonnieData(this Tower tower, BonnieData data)
     {
-        tower.GetOrCreateBonnieData().CurrentTier = data.CurrentTier;
-        tower.GetOrCreateBonnieData().MaxTier = data.MaxTier;
-        tower.GetOrCreateBonnieData().Bank = data.Bank;
-    }
-
-    public static void SaveBonnieData(this Tower tower, BonnieData data)
-    {
+        if (!tower.GetBonnieData(out _))
+        {
+            tower.CreateBonnieData(data);
+            return;
+        }
         tower.GetMutator(MutatorName).Cast<SupportRemoveFilterOutTag.MutatorTower>().removeScriptsWithSupportMutatorId = data.ToJson();
     }
 }

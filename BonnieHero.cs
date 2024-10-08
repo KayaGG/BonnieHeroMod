@@ -15,7 +15,6 @@ using Il2CppAssets.Scripts.Models;
 
 namespace BonnieHeroMod;
 
-[HarmonyPatch]
 public class BonnieHero : ModHero
 {
     public override string BaseTower => TowerType.SpikeFactory;
@@ -29,11 +28,9 @@ public class BonnieHero : ModHero
     public override string Portrait => "BonnieHero-Portrait";
     public override string Square => "BonnieHero-Square";
     public override string Button => "BonnieHero-Button";
-
     public override string NameStyle => TowerType.Gwendolin;
     public override string BackgroundStyle => TowerType.Gwendolin;
     public override string GlowStyle => TowerType.Gwendolin;
-
     public override float XpRatio => 1.0f;
 
     /// <param name="towerModel"></param>

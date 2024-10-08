@@ -28,7 +28,6 @@ namespace BonnieHeroMod;
 [HarmonyPatch]
 public class BonnieHeroMod : BloonsTD6Mod
 {
-    public Tower? PlacedBonnie = null;
     public override void OnTowerUpgraded(Tower tower, string upgradeName, TowerModel newBaseTowerModel)
     {
 
@@ -37,35 +36,26 @@ public class BonnieHeroMod : BloonsTD6Mod
             tower.GetBonnieData(out var towerLogic);
             switch (tower.towerModel.tier)
             {
-                case 2:
-                   // tower.AddMutator(new RangeSupport.MutatorTower(false, MutatorName, 0, 0, null));
-                    //tower.GetBonnieData().glueLevel = 10; //todo
-                    break;
                 case 5:
                     towerLogic.MaxTier = 15;
-                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 8:
                     towerLogic.MaxTier = 20;
-                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 11:
                     towerLogic.MaxTier = 25;
-                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 14:
                     towerLogic.MaxTier = 30;
-                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 17:
                     towerLogic.MaxTier = 35;
-                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
                 case 20:
                     towerLogic.MaxTier = 40;
-                    //BonnieLogic.BonnieUI.UpdateUI();
                     break;
             }
+            tower.SetBonnieData(towerLogic);
         }
     }
 
@@ -73,46 +63,30 @@ public class BonnieHeroMod : BloonsTD6Mod
     {
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
         {
-            PlacedBonnie = tower;
             if (tower.towerModel.tier > 0)
             {
-                var towerLogic = tower.GetOrCreateBonnieData();
-                tower.SaveBonnieData(towerLogic);
+                tower.CreateBonnieData(new BonnieData());
             }
         }
     }
 
     public override void OnTowerSold(Tower tower, float amount)
     {
-        base.OnTowerSold(tower, amount);
-
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
         {
-            if (tower.towerModel.tier > 0)
+            if (tower.GetBonnieData(out var towerLogic))
             {
-                if (tower.GetBonnieData(out var towerLogic))
-                {
-                    BonnieLogic.CartSellLogic();
-                    towerLogic.MaxTier = 10;
-                }
+                BonnieLogic.CartSellLogic(towerLogic);
             }
-            PlacedBonnie = null;
         }
     }
 
     public override void OnTowerSaved(Tower tower, TowerSaveDataModel saveData)
     {
-        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
+        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>() && tower.GetBonnieData(out var towerLogic))
         {
-            // var MinecartTier = tower.GetMutator(MutatorName)?.TryCast<RangeSupport.MutatorTower>();
-            // if (MinecartTier != null)
-            // {
-            //     saveData.metaData[MutatorName] = MinecartTier.multiplier.ToString();
-            //     saveData.metaData["MinecartTierBank"] = MinecartTier.additive.ToString();
-            //     saveData.metaData["MinecartMaxTier"] = MinecartTier.glueLevel.ToString();
-            // } //todo
-
-            PlacedBonnie = null;
+            saveData.metaData[MutatorName] = towerLogic.ToJson();
+            //todo
         }
     }
 
@@ -123,18 +97,10 @@ public class BonnieHeroMod : BloonsTD6Mod
             if (tower.mutators != null)
             {
                 tower.RemoveMutatorsById(MutatorName);
-
-                /*saveData.metaData.TryGetValue(MutatorName, out var minecartTier);
-                saveData.metaData.TryGetValue("MinecartTierBank", out var minecartTierBank);
-                saveData.metaData.TryGetValue("MinecartMaxTier", out var minecartMaxTier);
-
-                var minecartMutator = new RangeSupport.MutatorTower(false, MutatorName, float.Parse(minecartTierBank), float.Parse(minecartTier), null);
-                minecartMutator.glueLevel = int.Parse(minecartMaxTier);
-                tower.AddMutator(minecartMutator);*/
+                var bonnieData = BonnieData.Parse(saveData.metaData[MutatorName]);
+                tower.SetBonnieData(bonnieData);
                 //todo
             }
-            
-            PlacedBonnie = tower;
         }
     }
 

@@ -6,6 +6,7 @@ using BTD_Mod_Helper.Api.Enums;
 using BTD_Mod_Helper.Api.Helpers;
 using BTD_Mod_Helper.Extensions;
 using HarmonyLib;
+using Il2CppAssets.Scripts.Models.ServerEvents;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
@@ -147,6 +148,25 @@ public class BonnieUI : MonoBehaviour
             bonnieUI.SyncUI();
     }
 
+    [HideFromIl2Cpp]
+    [HarmonyPatch(typeof(TowerSelectionMenu), nameof(TowerSelectionMenu.UpdateTower))]
+    [HarmonyPostfix]
+    private static void MenuThemeManager_SetTheme(
+        TowerSelectionMenu __instance)
+    {
+        var themeManager = __instance.themeManager;
+        var currentTheme = themeManager.CurrentTheme;
+
+        if (currentTheme == null) return;
+
+        var bonnieUI = currentTheme.gameObject.GetComponent<BonnieUI>();
+
+        if (bonnieUI == null)
+            currentTheme.gameObject.AddComponent<BonnieUI>().Setup(__instance);
+        else
+            bonnieUI.SyncUI();
+    }
+
     private void Setup(TowerSelectionMenu menu)
     {
         _menu = menu;
@@ -168,8 +188,11 @@ public class BonnieUI : MonoBehaviour
         cartSell = bonniePanel.AddButton(new Info("CartSell", 225, -580, 300, 145), VanillaSprites.RedBtnLong,
             new Action(() =>
             {
-                BonnieLogic.CartSellLogic();
-                SyncUI();
+                if (_menu.selectedTower.tower.GetBonnieData(out BonnieData bonnieData))
+                {
+                    BonnieLogic.CartSellLogic(bonnieData);
+                    SyncUI();
+                }
             }));
         sellText = cartSell.AddText(new Info("CartSellText", 0, 5, 300, 135),
             "Sell \n(" + ")", 40);

@@ -2,11 +2,15 @@
 
 namespace BonnieHeroMod;
 
-public record BonnieData
+public struct BonnieData
 {
+    public BonnieData()
+    {
+    }
+
     public float MaxTier { get; set; } = 10;
-    public float CurrentTier { get; set; }
-    public float Bank { get; set; }
+    public float CurrentTier { get; set; } = 0;
+    public float Bank { get; set; } = 0;
 
     public static BonnieData Parse(string json)
     {

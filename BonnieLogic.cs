@@ -43,18 +43,18 @@ namespace BonnieHeroMod
                         towerLogic.CurrentTier++; //upgrade cart tier by 1
                         towerLogic.Bank += (float)Math.Floor(currentUpgradePrice * 0.7); //add cash to "bank"
                     }
+
+                    TowerSelectionMenu.instance.selectedTower.tower.SetBonnieData(towerLogic);
                 }
             }
         }
 
-        public static void CartSellLogic()
+        public static void CartSellLogic(BonnieData towerLogic)
         {
-            if(TowerSelectionMenu.instance.selectedTower.tower.GetBonnieData(out var towerLogic))
-            {
-                InGame.instance.SetCash(InGame.instance.GetCash() + towerLogic.Bank);
-                towerLogic.Bank = 0; //set "bank" to 0
-                towerLogic.CurrentTier = 0; //set cart tier to 0
-            }
+            InGame.instance.SetCash(InGame.instance.GetCash() + towerLogic.Bank);
+            towerLogic.Bank = 0; //set "bank" to 0
+            towerLogic.CurrentTier = 0; //set cart tier to 0
+            TowerSelectionMenu.instance.selectedTower.tower.SetBonnieData(towerLogic);
         }
     }
 }

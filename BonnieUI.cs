@@ -21,7 +21,6 @@ namespace BonnieHeroMod;
 [HarmonyPatch]
 public class BonnieUI : MonoBehaviour
 {
-    private TowerSelectionMenu _menu = null!;
     private ModHelperPanel bonniePanel;
     private ModHelperText cartTier;
     private ModHelperButton cartUpgrade;
@@ -31,13 +30,15 @@ public class BonnieUI : MonoBehaviour
 
     public void SyncUI()
     {
-        if (_menu?.selectedTower == null || _menu.selectedTower.tower.towerModel.baseId != ModContent.TowerID<BonnieHero>())
+        if (TowerSelectionMenu.instance.selectedTower == null ||
+            TowerSelectionMenu.instance.selectedTower.tower.towerModel.baseId != ModContent.TowerID<BonnieHero>() ||
+            TowerSelectionMenu.instance.selectedTower.tower.towerModel.tier < 2)
         {
             bonniePanel.SetActive(false);
             return;
         }
 
-        if(!_menu.selectedTower.tower.GetBonnieData(out var towerLogic))
+        if(!TowerSelectionMenu.instance.selectedTower.tower.GetBonnieData(out var towerLogic))
         {
             bonniePanel.SetActive(false);
             return;
@@ -98,10 +99,9 @@ public class BonnieUI : MonoBehaviour
 
         cartTier.SetText("Cart tier: " + towerLogic
             .CurrentTier + "\n Worth: " + cartWorth);
-        sellText.SetText("Sell \n(" + towerLogic.Bank + ")");
-        if (towerLogic.CurrentTier !=
-            towerLogic.MaxTier)
-        {
+        sellText.SetText("Sell \n(" + towerLogic.SellAmount + ")");
+        if (towerLogic.CurrentTier <
+            BonnieData.GetMaxTier(TowerSelectionMenu.instance.selectedTower.tower.towerModel.tier)) {
             upgradeText.SetText("Upgrade \n(" + nextUpgradePrice + ")");
         }
         else
@@ -117,13 +117,13 @@ public class BonnieUI : MonoBehaviour
     private static void MenuThemeManager_SetTheme(
         MenuThemeManager __instance, BaseTSMTheme newTheme)
     {
-        if (!__instance.selectionMenu.Is(out TowerSelectionMenu towerSelectionMenu))
+        if (!__instance.selectionMenu.Is(out TowerSelectionMenu _))
             return;
 
         var bonnieUI = newTheme.gameObject.GetComponent<BonnieUI>();
 
         if (bonnieUI == null)
-            newTheme.gameObject.AddComponent<BonnieUI>().Setup(towerSelectionMenu);
+            newTheme.gameObject.AddComponent<BonnieUI>().Setup();
         else
             bonnieUI.SyncUI();
     }
@@ -131,10 +131,10 @@ public class BonnieUI : MonoBehaviour
     [HideFromIl2Cpp]
     [HarmonyPatch(typeof(MenuThemeManager), nameof(MenuThemeManager.UpdateTheme))]
     [HarmonyPostfix]
-    private static void TowerSelectionMenu_SelectionChangedr(
+    private static void MenuThemeManager_UpdateTheme(
         MenuThemeManager __instance)
     {
-        if (!__instance.selectionMenu.Is(out TowerSelectionMenu towerSelectionMenu))
+        if (!__instance.selectionMenu.Is(out TowerSelectionMenu _))
             return;
 
         if (!__instance.currentTheme.Is(out BaseTSMTheme theme))
@@ -143,15 +143,16 @@ public class BonnieUI : MonoBehaviour
         var bonnieUI = theme.gameObject.GetComponent<BonnieUI>();
 
         if (bonnieUI == null)
-            theme.gameObject.AddComponent<BonnieUI>().Setup(towerSelectionMenu);
+            theme.gameObject.AddComponent<BonnieUI>().Setup();
         else
             bonnieUI.SyncUI();
     }
 
     [HideFromIl2Cpp]
+    [HarmonyPatch(typeof(TowerSelectionMenu), nameof(TowerSelectionMenu.TowerUpgraded))]
     [HarmonyPatch(typeof(TowerSelectionMenu), nameof(TowerSelectionMenu.UpdateTower))]
     [HarmonyPostfix]
-    private static void MenuThemeManager_SetTheme(
+    private static void TowerSelectionMenu_UpdateTower(
         TowerSelectionMenu __instance)
     {
         var themeManager = __instance.themeManager;
@@ -162,14 +163,13 @@ public class BonnieUI : MonoBehaviour
         var bonnieUI = currentTheme.gameObject.GetComponent<BonnieUI>();
 
         if (bonnieUI == null)
-            currentTheme.gameObject.AddComponent<BonnieUI>().Setup(__instance);
+            currentTheme.gameObject.AddComponent<BonnieUI>().Setup();
         else
             bonnieUI.SyncUI();
     }
 
-    private void Setup(TowerSelectionMenu menu)
+    private void Setup()
     {
-        _menu = menu;
         bonniePanel = gameObject.AddModHelperPanel(new Info("BonniePanel",
             InfoPreset.FillParent));
 
@@ -188,7 +188,7 @@ public class BonnieUI : MonoBehaviour
         cartSell = bonniePanel.AddButton(new Info("CartSell", 225, -580, 300, 145), VanillaSprites.RedBtnLong,
             new Action(() =>
             {
-                if (_menu.selectedTower.tower.GetBonnieData(out BonnieData bonnieData))
+                if (TowerSelectionMenu.instance.selectedTower.tower.GetBonnieData(out BonnieData bonnieData))
                 {
                     BonnieLogic.CartSellLogic(bonnieData);
                     SyncUI();

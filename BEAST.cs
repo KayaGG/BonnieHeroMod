@@ -102,9 +102,9 @@ namespace BonnieHeroMod
                 projectile.Position.Y = __instance.bloon.Position.Y;
                 projectile.Position.Z = 20;
 
-                projectile.direction.X = 0;
-                projectile.direction.Y = 0;
-                projectile.direction.Z = 0;
+                projectile.Direction.X = 0;
+                projectile.Direction.Y = 0;
+                projectile.Direction.Z = 0;
                 projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
                 projectile.target = new Target(targetPos);
 
@@ -112,7 +112,7 @@ namespace BonnieHeroMod
                     __instance.bloon.Position.Y, 100);
 
                 projectile.EmittedBy = bonnieHero;
-                projectile.lifespan = 999999;
+                projectile.Lifespan = 999999;
             }
         }
 
@@ -120,92 +120,88 @@ namespace BonnieHeroMod
         [HarmonyPrefix]
         private static void Bloon_Spawn(Bloon bloon)
         {
-            if (bloon.bloonModel.baseId == BloonID<BEAST>())
-            {
-                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
-                if (bonnieHero == null)
-                {
-                    MelonLogger.Error("bonnie is null");
-                    return;
-                }
-                switch (bonnieHero.towerModel.tier)
-                {
-                    case < 16:
-                        break;
-                    case < 20:
-                        bloon.health = bloon.bloonModel.maxHealth = 10000;
-                        break;
-                    case 20:
-                        bloon.health = bloon.bloonModel.maxHealth = 20000;
-                        break;
-                }
+            if (bloon.bloonModel.baseId != BloonID<BEAST>()) return;
 
-                bloon.GetBloonBehavior<HealthPercentTrigger>().lowestHealth = bloon.bloonModel.maxHealth;
+            var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
+            if (bonnieHero == null)
+            {
+                return;
             }
+            switch (bonnieHero.towerModel.tier)
+            {
+                case < 16:
+                    break;
+                case < 20:
+                    bloon.health = bloon.bloonModel.maxHealth = 10000;
+                    break;
+                case 20:
+                    bloon.health = bloon.bloonModel.maxHealth = 20000;
+                    break;
+            }
+
+            bloon.GetBloonBehavior<HealthPercentTrigger>().lowestHealth = bloon.bloonModel.maxHealth;
         }
 
         [HarmonyPatch(typeof(Bloon), nameof(Bloon.Process))]
         [HarmonyPostfix]
         private static void BEASTStun(Bloon __instance)
         {
-            if (__instance.bloonModel.baseId == BloonID<BEAST>())
+            if (__instance.bloonModel.baseId != BloonID<BEAST>()) return;
+            var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
+            if (bonnieHero == null)
             {
-                var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
-                if (bonnieHero == null)
+                MelonLogger.Error("bonnie is null");
+                return;
+            }
+
+            var collisionState = InGame.instance.bridge.Simulation.collisionChecker.GetInRange<Bloon>(__instance.Position.X, __instance.Position.Y, 12);
+
+            if (__instance.baseScale == 1)
+            {
+
+                __instance.baseScale = 0.8f;
+            }
+            if (__instance.GetUnityDisplayNode() != null)
+            {
+                __instance.Rotation += 90;
+            }
+
+            if (collisionState == null)
+                return;
+
+            while (collisionState.MoveNext())
+            {
+                var bloon = collisionState._Current_k__BackingField;
+                if (bloon == null || bloon.bloonModel.baseId == BloonID<BEAST>())
+                    continue;
+
+                var stunDuration = 5;
+                var moabStunDuration = 2;
+                switch (bonnieHero.towerModel.tier)
                 {
-                    MelonLogger.Error("bonnie is null");
-                    return;
+                    case < 16:
+                        break;
+                    case < 20:
+                        stunDuration = 10;
+                        moabStunDuration = 4;
+                        break;
+                    case 20:
+                        stunDuration = 15;
+                        moabStunDuration = 6;
+                        break;
                 }
 
-                var collisionState = InGame.instance.bridge.Simulation.collisionChecker.GetInRange<Bloon>(__instance.Position.X, __instance.Position.Y, 12);
 
-                if (__instance.baseScale == 1)
+
+                var slowMutator = new SlowModel.SlowMutator(0, "Stun:BEASTStun", "SniperStun", true, false, 0);
+
+                if (!bloon.bloonModel.isMoab)
                 {
-
-                    __instance.baseScale = 0.8f;
+                    bloon.AddMutator(slowMutator, stunDuration * 60);
                 }
-                if (__instance.GetUnityDisplayNode() != null)
+                else
                 {
-                    __instance.Rotation += 90;
-                }
-
-                if (collisionState == null)
-                    return;
-
-                while (collisionState.MoveNext())
-                {
-                    var bloon = collisionState.Current;
-                    if (bloon == null || bloon.bloonModel.baseId == BloonID<BEAST>())
-                        continue;
-
-                    var stunDuration = 5;
-                    var moabStunDuration = 2;
-                    switch (bonnieHero.towerModel.tier)
-                    {
-                        case < 16:
-                            break;
-                        case < 20:
-                            stunDuration = 10;
-                            moabStunDuration = 4;
-                            break;
-                        case 20:
-                            stunDuration = 15;
-                            moabStunDuration = 6;
-                            break;
-                    }
-
-
-
-                    var slowMutator = new SlowModel.SlowMutator(0, "Stun:BEASTStun", "SniperStun", true, false, 0);
-
-                    if (!bloon.bloonModel.isMoab)
-                    {
-                        bloon.AddMutator(slowMutator, stunDuration * 60);
-                    }
-                    else
-                    {
-                        bloon.AddMutator(slowMutator, moabStunDuration * 60);
-                    }
+                    bloon.AddMutator(slowMutator, moabStunDuration * 60);
                 }
             }
         }

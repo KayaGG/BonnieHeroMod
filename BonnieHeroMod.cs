@@ -28,56 +28,20 @@ namespace BonnieHeroMod;
 [HarmonyPatch]
 public class BonnieHeroMod : BloonsTD6Mod
 {
-    public override void OnTowerUpgraded(Tower tower, string upgradeName, TowerModel newBaseTowerModel)
-    {
-
-        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
-        {
-            tower.GetBonnieData(out var towerLogic);
-            switch (tower.towerModel.tier)
-            {
-                case 5:
-                    towerLogic.MaxTier = 15;
-                    break;
-                case 8:
-                    towerLogic.MaxTier = 20;
-                    break;
-                case 11:
-                    towerLogic.MaxTier = 25;
-                    break;
-                case 14:
-                    towerLogic.MaxTier = 30;
-                    break;
-                case 17:
-                    towerLogic.MaxTier = 35;
-                    break;
-                case 20:
-                    towerLogic.MaxTier = 40;
-                    break;
-            }
-            tower.SetBonnieData(towerLogic);
-        }
-    }
-
     public override void OnTowerCreated(Tower tower, Entity target, Model modelToUse)
     {
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
         {
-            if (tower.towerModel.tier > 0)
-            {
-                tower.CreateBonnieData(new BonnieData());
-            }
+            tower.CreateBonnieData(new BonnieData());
         }
     }
 
     public override void OnTowerSold(Tower tower, float amount)
     {
-        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
+        if (tower.towerModel.baseId != ModContent.TowerID<BonnieHero>()) return;
+        if (tower.GetBonnieData(out var towerLogic))
         {
-            if (tower.GetBonnieData(out var towerLogic))
-            {
-                BonnieLogic.CartSellLogic(towerLogic);
-            }
+            BonnieLogic.CartSellLogic(towerLogic);
         }
     }
 
@@ -92,15 +56,12 @@ public class BonnieHeroMod : BloonsTD6Mod
 
     public override void OnTowerLoaded(Tower tower, TowerSaveDataModel saveData)
     {
-        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>())
+        if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>() && tower.mutators != null)
         {
-            if (tower.mutators != null)
-            {
-                tower.RemoveMutatorsById(MutatorName);
-                var bonnieData = BonnieData.Parse(saveData.metaData[MutatorName]);
-                tower.SetBonnieData(bonnieData);
-                //todo
-            }
+            tower.RemoveMutatorsById(MutatorName);
+            var bonnieData = BonnieData.Parse(saveData.metaData[MutatorName]);
+            tower.SetBonnieData(bonnieData);
+            //todo
         }
     }
 
@@ -127,43 +88,4 @@ public class BonnieHeroMod : BloonsTD6Mod
         }
     }
 #endif
-
-    [HarmonyPatch(typeof(Ability), nameof(Ability.Activate))]
-    public static class BonnieAbility
-    {
-        [HarmonyPostfix]
-        public static void baPostfix(Ability __instance)
-        {
-            var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == ModContent.TowerID<BonnieHero>());
-            if (bonnieHero != null)
-            {
-                if (__instance.abilityModel.name == "AbilityModel_MassDetonation")
-                {
-                    var bloons = InGame.instance.GetBloons();
-                    if (bloons != null)
-                    {
-                        foreach (var bloon in bloons)
-                        {
-                            if (bloon.bloonModel.baseId == ModContent.BloonID<BloonstoneCart>())
-                            {
-                                var attackModel = bonnieHero.towerModel.GetAttackModel();
-                                var dynamite = attackModel.weapons[0].projectile;
-                                var explosion = dynamite.GetBehavior<CreateProjectileOnContactModel>().projectile;
-
-                                var cartExplosionProjectile = InGame.instance.GetMainFactory().CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(explosion);
-
-                                cartExplosionProjectile.Position.X = bloon.Position.X;
-                                cartExplosionProjectile.Position.Y = bloon.Position.Y;
-                                cartExplosionProjectile.Position.Z = bloon.Position.Z;
-
-                                cartExplosionProjectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
-
-                                bloon.Degrade(false, bonnieHero, false);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

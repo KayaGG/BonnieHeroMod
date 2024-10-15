@@ -6,25 +6,70 @@ using Il2CppAssets.Scripts.Models.Towers.Projectiles;
 using Il2CppAssets.Scripts.Models.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Models.Towers.Weapons;
 using Il2CppAssets.Scripts.Simulation.Bloons;
+using Il2CppAssets.Scripts.Simulation.Bloons.Behaviors;
+using Il2CppAssets.Scripts.Simulation.SMath;
 using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
 using Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
-using MelonLoader;
 using UnityEngine;
 using static BTD_Mod_Helper.Api.ModContent;
-using Vector3 = Il2CppAssets.Scripts.Simulation.SMath.Vector3;
 
 namespace BonnieHeroMod;
 
 [HarmonyPatch]
-public class Patches
+public static class Patches
 {
-    [HarmonyPatch(typeof(SupportRemoveFilterOutTag.MutatorTower), nameof(SupportRemoveFilterOutTag.MutatorTower.Mutate))]
+    private static void CreateCashProjectile(Tower bonnieHero, Vector3Boxed position, float amount)
+    {
+        var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile
+            .Duplicate();
+        cashProjectile.RemoveBehavior<AgeModel>();
+
+        cashProjectile.GetBehavior<CashModel>().minimum = amount;
+        cashProjectile.GetBehavior<CashModel>().maximum = amount;
+
+        var ageModel = new AgeModel("BloonstoneCash_AgeModel", 999999f, 999999, true, null);
+
+        cashProjectile.AddBehavior(ageModel);
+
+        var projectile = InGame.instance.GetMainFactory()
+            .CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(
+                cashProjectile);
+        var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
+        const uint dropRange = 20;
+        arriveAtTarget.SetStartPosition(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(position.X,
+            position.Y, 100));
+
+        var targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(
+            position.X + Random.Range(-dropRange, dropRange),
+            position.Y + Random.Range(-dropRange, dropRange), 100);
+        arriveAtTarget.targetPos = targetPos;
+
+        projectile.Position.X = position.X;
+        projectile.Position.Y = position.Y;
+        projectile.Position.Z = 20;
+
+        projectile.Direction.X = 0;
+        projectile.Direction.Y = 0;
+        projectile.Direction.Z = 0;
+        projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
+        projectile.target = new Target(targetPos);
+
+        projectile.emittedFrom = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(position.X,
+            position.Y, 100);
+
+        projectile.EmittedBy = bonnieHero;
+        projectile.Lifespan = 999999;
+    }
+
+    [HarmonyPatch(typeof(SupportRemoveFilterOutTag.MutatorTower),
+        nameof(SupportRemoveFilterOutTag.MutatorTower.Mutate))]
     [HarmonyPrefix]
-    private static bool SupportRemoveFilterOutTag_MutatorTower_Mutate(SupportRemoveFilterOutTag.MutatorTower __instance, Model model, ref bool __result)
+    private static bool SupportRemoveFilterOutTag_MutatorTower_Mutate(SupportRemoveFilterOutTag.MutatorTower __instance,
+        Model model, ref bool __result)
     {
         if (__instance.id == MutatorName)
         {
@@ -46,10 +91,6 @@ public class Patches
         {
             return;
         }
-
-        var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile
-            .Duplicate();
-        cashProjectile.RemoveBehavior<AgeModel>();
 
         var cartWorth = 25f;
 
@@ -84,47 +125,12 @@ public class Patches
             }
         }
 
-
-        cashProjectile.GetBehavior<CashModel>().minimum = cartWorth;
-        cashProjectile.GetBehavior<CashModel>().maximum = cartWorth;
-
-        var ageModel = new AgeModel("BloonstoneCash_AgeModel", 999999f, 999999, true, null);
-
-        cashProjectile.AddBehavior(ageModel);
-
-        var projectile = InGame.instance.GetMainFactory()
-            .CreateEntityWithBehavior<Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(
-                cashProjectile);
-        var arriveAtTarget = projectile.GetProjectileBehavior<ArriveAtTarget>();
-        const uint dropRange = 20;
-        arriveAtTarget.SetStartPosition(new Il2CppAssets.Scripts.Simulation.SMath.Vector3(__instance.Position.X,
-            __instance.Position.Y, 100));
-
-        var targetPos = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(
-            __instance.Position.X + Random.Range(-dropRange, dropRange),
-            __instance.Position.Y + Random.Range(-dropRange, dropRange), 100);
-        arriveAtTarget.targetPos = targetPos;
-
-        projectile.Position.X = __instance.Position.X;
-        projectile.Position.Y = __instance.Position.Y;
-        projectile.Position.Z = 20;
-
-        projectile.Direction.X = 0;
-        projectile.Direction.Y = 0;
-        projectile.Direction.Z = 0;
-        projectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
-        projectile.target = new Target(targetPos);
-
-        projectile.emittedFrom = new Il2CppAssets.Scripts.Simulation.SMath.Vector3(__instance.Position.X,
-            __instance.Position.Y, 100);
-
-        projectile.EmittedBy = bonnieHero;
-        projectile.Lifespan = 999999;
+        CreateCashProjectile(bonnieHero, __instance.Position, cartWorth);
     }
 
     [HarmonyPatch(typeof(Bloon), nameof(Bloon.OnSpawn))]
     [HarmonyPrefix]
-    private static void Bloon_Spawn(Bloon __instance)
+    private static void Bloon_OnSpawn(Bloon __instance)
     {
         if (__instance.bloonModel.baseId == BloonID<BloonstoneCart>())
         {
@@ -166,33 +172,40 @@ public class Patches
                 }
             }
         }
-    }
 
-    [HarmonyPatch(typeof(Bloon), nameof(Bloon.Process))]
-    [HarmonyPostfix]
-    private static void CartRotation(Bloon __instance)
-    {
-        if (__instance.bloonModel.baseId == BloonID<BloonstoneCart>())
+        if (__instance.bloonModel.baseId == BloonID<BEAST>())
         {
-            if (__instance.GetUnityDisplayNode() != null)
+            var bonnieHero = InGame.instance.GetTowers()
+                .Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
+            if (bonnieHero == null)
             {
-                __instance.Rotation += 225;
+                return;
             }
+
+            switch (bonnieHero.towerModel.tier)
+            {
+                case < 16:
+                    break;
+                case < 20:
+                    __instance.health = __instance.bloonModel.maxHealth = 10000;
+                    break;
+                case 20:
+                    __instance.health = __instance.bloonModel.maxHealth = 20000;
+                    break;
+            }
+
+            __instance.GetBloonBehavior<HealthPercentTrigger>().lowestHealth = __instance.bloonModel.maxHealth;
         }
     }
-
 
     [HarmonyPatch(typeof(InGame), nameof(InGame.RoundStart))]
     [HarmonyPostfix]
     private static void InGame_RoundStart()
     {
         var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
-        if (bonnieHero != null)
+        if (bonnieHero != null && bonnieHero.towerModel.tier > 0)
         {
-            if (bonnieHero.towerModel.tier > 0)
-            {
-                InGame.instance.SpawnBloons(BloonID<BloonstoneCart>(), 3, 480);
-            }
+            InGame.instance.SpawnBloons(BloonID<BloonstoneCart>(), 3, 480);
         }
     }
 
@@ -202,34 +215,31 @@ public class Patches
     {
         var bonnieHero = InGame.instance.GetTowers()
             .Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
-        if (bonnieHero != null)
+        if (bonnieHero != null && __instance.abilityModel.name == "AbilityModel_MassDetonation")
         {
-            if (__instance.abilityModel.name == "AbilityModel_MassDetonation")
+            var bloons = InGame.instance.GetBloons();
+            if (bloons != null)
             {
-                var bloons = InGame.instance.GetBloons();
-                if (bloons != null)
+                foreach (var bloon in bloons)
                 {
-                    foreach (var bloon in bloons)
+                    if (bloon.bloonModel.baseId == BloonID<BloonstoneCart>())
                     {
-                        if (bloon.bloonModel.baseId == BloonID<BloonstoneCart>())
-                        {
-                            var attackModel = bonnieHero.towerModel.GetAttackModel();
-                            var dynamite = attackModel.weapons[0].projectile;
-                            var explosion = dynamite.GetBehavior<CreateProjectileOnContactModel>().projectile;
+                        var attackModel = bonnieHero.towerModel.GetAttackModel();
+                        var dynamite = attackModel.weapons[0].projectile;
+                        var explosion = dynamite.GetBehavior<CreateProjectileOnContactModel>().projectile;
 
-                            var cartExplosionProjectile = InGame.instance.GetMainFactory()
-                                .CreateEntityWithBehavior<
-                                    Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(
-                                    explosion);
+                        var cartExplosionProjectile = InGame.instance.GetMainFactory()
+                            .CreateEntityWithBehavior<
+                                Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Projectile, ProjectileModel>(
+                                explosion);
 
-                            cartExplosionProjectile.Position.X = bloon.Position.X;
-                            cartExplosionProjectile.Position.Y = bloon.Position.Y;
-                            cartExplosionProjectile.Position.Z = bloon.Position.Z;
+                        cartExplosionProjectile.Position.X = bloon.Position.X;
+                        cartExplosionProjectile.Position.Y = bloon.Position.Y;
+                        cartExplosionProjectile.Position.Z = bloon.Position.Z;
 
-                            cartExplosionProjectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
+                        cartExplosionProjectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
 
-                            bloon.Degrade(false, bonnieHero, false);
-                        }
+                        bloon.Degrade(false, bonnieHero, false);
                     }
                 }
             }
@@ -238,6 +248,114 @@ public class Patches
         if (__instance.abilityModel.name == "AbilityModel_BEAST")
         {
             InGame.instance.SpawnBloons(ModContent.BloonID<BEAST>(), 1, 0);
+        }
+    }
+
+    [HarmonyPatch(typeof(HealthPercentTrigger), nameof(HealthPercentTrigger.Trigger))]
+    [HarmonyPostfix]
+    public static void HealthPercentTrigger_Trigger(HealthPercentTrigger __instance)
+    {
+        if (__instance.bloon.bloonModel.baseId == BloonID<BEAST>())
+        {
+            var bonnieHero = InGame.instance.GetTowers()
+                .Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
+            if (bonnieHero == null)
+            {
+                return;
+            }
+
+            var cashProjectile = Game.instance.model.GetTower("BananaFarm", 5).GetDescendant<WeaponModel>().projectile
+                .Duplicate();
+            cashProjectile.RemoveBehavior<AgeModel>();
+
+            var worth = 25f;
+
+            switch (bonnieHero.towerModel.tier)
+            {
+                case < 16:
+                    worth = 25f;
+                    break;
+                case < 20:
+                    worth = 50f;
+                    break;
+                case 20:
+                    worth = 100f;
+                    break;
+            }
+
+            CreateCashProjectile(bonnieHero, __instance.bloon.Position, worth);
+        }
+    }
+
+    [HarmonyPatch(typeof(Bloon), nameof(Bloon.Process))]
+    [HarmonyPostfix]
+    private static void Bloon_Process(Bloon __instance)
+    {
+        if (__instance.bloonModel.baseId == BloonID<BloonstoneCart>() && __instance.GetUnityDisplayNode() != null)
+        {
+            __instance.Rotation += 225;
+        }
+
+        if (__instance.bloonModel.baseId == BloonID<BEAST>())
+        {
+            var bonnieHero = InGame.instance.GetTowers()
+                .Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
+            if (bonnieHero == null)
+            {
+                return;
+            }
+
+            var collisionState =
+                InGame.instance.bridge.Simulation.collisionChecker.GetInRange<Bloon>(__instance.Position.X,
+                    __instance.Position.Y, 12);
+
+            if (Mathf.Approximately(__instance.baseScale, 1))
+            {
+                __instance.baseScale = 0.8f;
+            }
+
+            if (__instance.GetUnityDisplayNode() != null)
+            {
+                __instance.Rotation += 90;
+            }
+
+            if (collisionState == null)
+                return;
+
+            while (collisionState.MoveNext())
+            {
+                var bloon = collisionState._Current_k__BackingField;
+                if (bloon == null || bloon.bloonModel.baseId == BloonID<BEAST>())
+                    continue;
+
+                var stunDuration = 5;
+                var moabStunDuration = 2;
+                switch (bonnieHero.towerModel.tier)
+                {
+                    case < 16:
+                        break;
+                    case < 20:
+                        stunDuration = 10;
+                        moabStunDuration = 4;
+                        break;
+                    case 20:
+                        stunDuration = 15;
+                        moabStunDuration = 6;
+                        break;
+                }
+
+
+                var slowMutator = new SlowModel.SlowMutator(0, "Stun:BEASTStun", "SniperStun", true, false, 0);
+
+                if (!bloon.bloonModel.isMoab)
+                {
+                    bloon.AddMutator(slowMutator, stunDuration * 60);
+                }
+                else
+                {
+                    bloon.AddMutator(slowMutator, moabStunDuration * 60);
+                }
+            }
         }
     }
 }

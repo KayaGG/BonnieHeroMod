@@ -38,11 +38,7 @@ public class BonnieHeroMod : BloonsTD6Mod
 
     public override void OnTowerSold(Tower tower, float amount)
     {
-        if (tower.towerModel.baseId != ModContent.TowerID<BonnieHero>()) return;
-        if (tower.GetBonnieData(out var towerLogic))
-        {
-            BonnieLogic.CartSellLogic(towerLogic);
-        }
+        tower.SellCarts();
     }
 
     public override void OnTowerSaved(Tower tower, TowerSaveDataModel saveData)
@@ -50,7 +46,6 @@ public class BonnieHeroMod : BloonsTD6Mod
         if (tower.towerModel.baseId == ModContent.TowerID<BonnieHero>() && tower.GetBonnieData(out var towerLogic))
         {
             saveData.metaData[MutatorName] = towerLogic.ToJson();
-            //todo
         }
     }
 
@@ -61,9 +56,9 @@ public class BonnieHeroMod : BloonsTD6Mod
             tower.RemoveMutatorsById(MutatorName);
             var bonnieData = BonnieData.Parse(saveData.metaData[MutatorName]);
             tower.SetBonnieData(bonnieData);
-            //todo
         }
     }
+
 
 #if DEBUG
     public override void OnMatchStart()

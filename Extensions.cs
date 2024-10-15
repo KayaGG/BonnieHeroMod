@@ -1,7 +1,11 @@
 ﻿global using static BonnieHeroMod.Extensions;
 using System.Diagnostics.CodeAnalysis;
+using BTD_Mod_Helper.Extensions;
 using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame.TowerSelectionMenu;
+
 namespace BonnieHeroMod;
 
 public static class Extensions
@@ -43,5 +47,16 @@ public static class Extensions
             return;
         }
         tower.GetMutator(MutatorName).Cast<SupportRemoveFilterOutTag.MutatorTower>().removeScriptsWithSupportMutatorId = data.ToJson();
+    }
+
+    public static void SellCarts(this Tower tower)
+    {
+        if (tower.GetBonnieData(out BonnieData bonnieData))
+        {
+            InGame.instance.SetCash(InGame.instance.GetCash() + bonnieData.SellAmount);
+            bonnieData.SellAmount = 0; //set "bank" to 0
+            bonnieData.CurrentTier = 0; //set cart tier to 0
+            TowerSelectionMenu.instance.selectedTower.tower.SetBonnieData(bonnieData);
+        }
     }
 }

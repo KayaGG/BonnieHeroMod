@@ -21,12 +21,12 @@ namespace BonnieHeroMod;
 [HarmonyPatch]
 public class BonnieUI : MonoBehaviour
 {
-    private ModHelperPanel bonniePanel;
-    private ModHelperText cartTier;
-    private ModHelperButton cartUpgrade;
-    private ModHelperText upgradeText;
-    private ModHelperButton cartSell;
-    private ModHelperText sellText;
+    private ModHelperPanel _bonniePanel = null!;
+    private ModHelperText _cartTier = null!;
+    private ModHelperButton _cartUpgrade = null!;
+    private ModHelperText upgradeText = null!;
+    private ModHelperButton cartSell = null!;
+    private ModHelperText sellText = null!;
 
     public void SyncUI()
     {
@@ -34,17 +34,17 @@ public class BonnieUI : MonoBehaviour
             TowerSelectionMenu.instance.selectedTower.tower.towerModel.baseId != ModContent.TowerID<BonnieHero>() ||
             TowerSelectionMenu.instance.selectedTower.tower.towerModel.tier < 2)
         {
-            bonniePanel.SetActive(false);
+            _bonniePanel.SetActive(false);
             return;
         }
 
         if(!TowerSelectionMenu.instance.selectedTower.tower.GetBonnieData(out var towerLogic))
         {
-            bonniePanel.SetActive(false);
+            _bonniePanel.SetActive(false);
             return;
         }
 
-        bonniePanel.SetActive(true);
+        _bonniePanel.SetActive(true);
 
 
         var nextUpgradePrice = 0;
@@ -97,7 +97,7 @@ public class BonnieUI : MonoBehaviour
                 _ => nextUpgradePrice
             };
 
-        cartTier.SetText("Cart tier: " + towerLogic
+        _cartTier.SetText("Cart tier: " + towerLogic
             .CurrentTier + "\n Worth: " + cartWorth);
         sellText.SetText("Sell \n(" + towerLogic.SellAmount + ")");
         if (towerLogic.CurrentTier <
@@ -170,27 +170,57 @@ public class BonnieUI : MonoBehaviour
 
     private void Setup()
     {
-        bonniePanel = gameObject.AddModHelperPanel(new Info("BonniePanel",
+        _bonniePanel = gameObject.AddModHelperPanel(new Info("BonniePanel",
             InfoPreset.FillParent));
 
-        cartTier = bonniePanel.AddText(new Info("CartTier", 220, -120, 400, 145),
+        _cartTier = _bonniePanel.AddText(new Info("CartTier", 220, -120, 400, 145),
             "Cart tier: " +
             "\n Worth: ", 40, Il2CppTMPro.TextAlignmentOptions.TopRight);
 
-        cartUpgrade = bonniePanel.AddButton(new Info("CartUpgrade", -225, -580, 300, 145), VanillaSprites.GreenBtnLong,
+        var _cartUpgrade = _bonniePanel.AddButton(new Info("CartUpgrade", -225, -580, 300, 145), VanillaSprites.GreenBtnLong,
             new Action(() =>
             {
-                BonnieLogic.CartUpgradeLogic();
+                if (TowerSelectionMenu.instance.selectedTower.tower.GetBonnieData(out var towerLogic) &&
+                    towerLogic.CurrentTier < BonnieData.GetMaxTier(
+                        TowerSelectionMenu.instance.selectedTower.tower.towerModel.tier))
+                {
+                    var currentUpgradePrice = 0;
+                    var mods = InGame.instance.GetGameModel().AllMods.ToIl2CppList();
+
+                    // CURRENT Upgrade price switch case
+                    currentUpgradePrice = towerLogic.CurrentTier switch
+                    {
+                        < 5 => CostHelper.CostForDifficulty(300, mods),
+                        < 10 => CostHelper.CostForDifficulty(1000, mods),
+                        < 15 => CostHelper.CostForDifficulty(2700, mods),
+                        < 20 => CostHelper.CostForDifficulty(4800, mods),
+                        < 25 => CostHelper.CostForDifficulty(8800, mods),
+                        < 30 => CostHelper.CostForDifficulty(13300, mods),
+                        < 35 => CostHelper.CostForDifficulty(21000, mods),
+                        < 40 => CostHelper.CostForDifficulty(29000, mods),
+                        _ => currentUpgradePrice
+                    };
+
+                    if (currentUpgradePrice < InGame.instance.GetCash())
+                    {
+                        InGame.instance.SetCash(InGame.instance.GetCash() - currentUpgradePrice);
+                        towerLogic.CurrentTier++; //upgrade cart tier by 1
+                        towerLogic.SellAmount += (float)Math.Floor(currentUpgradePrice * 0.7); //add cash to "bank"
+                    }
+
+                    TowerSelectionMenu.instance.selectedTower.tower.SetBonnieData(towerLogic);
+                }
+
                 SyncUI();
             }));
-        upgradeText = cartUpgrade.AddText(new Info("CartUpgradeText", 0, 5, 300, 145), "Upgrade \n(" + 0 + ")");
+        upgradeText = _cartUpgrade.AddText(new Info("CartUpgradeText", 0, 5, 300, 145), "Upgrade \n(" + 0 + ")");
 
-        cartSell = bonniePanel.AddButton(new Info("CartSell", 225, -580, 300, 145), VanillaSprites.RedBtnLong,
+        cartSell = _bonniePanel.AddButton(new Info("CartSell", 225, -580, 300, 145), VanillaSprites.RedBtnLong,
             new Action(() =>
             {
                 if (TowerSelectionMenu.instance.selectedTower.tower.GetBonnieData(out BonnieData bonnieData))
                 {
-                    BonnieLogic.CartSellLogic(bonnieData);
+                    TowerSelectionMenu.instance.selectedTower.tower.SellCarts();
                     SyncUI();
                 }
             }));

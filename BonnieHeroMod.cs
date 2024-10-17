@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MelonLoader;
 using BTD_Mod_Helper;
 using BonnieHeroMod;
@@ -59,6 +60,15 @@ public class BonnieHeroMod : BloonsTD6Mod
         }
     }
 
+
+    /// <inheritdoc />
+    public override void OnNewGameModel(GameModel result, IReadOnlyList<ModModel> mods)
+    {
+        base.OnNewGameModel(result, mods);
+        CurrentMods = mods;
+    }
+
+    public static IReadOnlyList<ModModel> CurrentMods { get; set; } = [ ];
 
 #if DEBUG
     public override void OnMatchStart()

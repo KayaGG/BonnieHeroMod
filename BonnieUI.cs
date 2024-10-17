@@ -49,7 +49,7 @@ public class BonnieUI : MonoBehaviour
 
         var nextUpgradePrice = 0;
         var cartWorth = 25f;
-        var mods = InGame.instance.GetGameModel().AllMods.ToIl2CppList();
+        var mods = BonnieHeroMod.CurrentMods.ToIl2CppList();
 
         for (int i = 0;
              i < towerLogic.CurrentTier;

@@ -185,7 +185,7 @@ public class BonnieUI : MonoBehaviour
                         TowerSelectionMenu.instance.selectedTower.tower.towerModel.tier))
                 {
                     var currentUpgradePrice = 0;
-                    var mods = InGame.instance.GetGameModel().AllMods.ToIl2CppList();
+                    var mods = BonnieHeroMod.CurrentMods.ToIl2CppList();
 
                     // CURRENT Upgrade price switch case
                     currentUpgradePrice = towerLogic.CurrentTier switch

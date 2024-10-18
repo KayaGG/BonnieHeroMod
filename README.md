@@ -8,10 +8,4 @@ Bonnie Hero Mod
 
 A project aiming to port Bonnie from BTD Battles 2 over to BTD 6 and make rebalance her for the different environment. Made with help of GrahamKracker & DatJaneDoe.
 
-KNOWN BUGS:
-* UI Initialization fails under certain circumstances
-* Logic fails to initialize when playing CHIMPS, non issue as her main purpose is cash income, which is disabled in CHIMPS
-
-Please still report these WITH DETAILS
-
 [![Requires BTD6 Mod Helper](https://raw.githubusercontent.com/gurrenm3/BTD-Mod-Helper/master/banner.png)](https://github.com/gurrenm3/BTD-Mod-Helper#readme)

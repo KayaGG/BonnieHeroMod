@@ -70,7 +70,7 @@ public class BonnieHeroMod : BloonsTD6Mod
 
     public static IReadOnlyList<ModModel> CurrentMods { get; set; } = [ ];
 
-#if DEBUG
+#if false
     public override void OnMatchStart()
     {
         string newHero = ModContent.TowerID<BonnieHero>();

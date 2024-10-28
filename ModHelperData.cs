@@ -3,7 +3,7 @@ namespace BonnieHeroMod;
 public static class ModHelperData
 {
     public const string WorksOnVersion = "45.1";
-    public const string Version = "45.2.0";
+    public const string Version = "45.2.1";
     public const string Name = "BonnieHeroMod";
     public const string Author = "KayaGG";
 

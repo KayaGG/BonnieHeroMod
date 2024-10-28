@@ -38,6 +38,9 @@ public class BEAST : ModBloon
         bloonModel.disallowCosmetics = true;
         bloonModel.dontShowInSandbox = true;
 
+        bloonModel.RemoveTag("Moab");
+        bloonModel.RemoveTag("Moabs");
+
         bloonModel.RemoveAllChildren();
         bloonModel.RemoveBehavior<DamageStateModel>();
         bloonModel.damageDisplayStates = bloonModel.damageDisplayStates.Empty();

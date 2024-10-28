@@ -31,7 +31,7 @@ public class BonnieHero : ModHero
     public override string NameStyle => TowerType.Gwendolin;
     public override string BackgroundStyle => TowerType.Gwendolin;
     public override string GlowStyle => TowerType.Gwendolin;
-    public override float XpRatio => 1.0f;
+    public override float XpRatio => 1.71f;
 
     /// <param name="towerModel"></param>
     public override void ModifyBaseTowerModel(TowerModel towerModel)

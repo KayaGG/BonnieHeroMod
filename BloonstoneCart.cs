@@ -16,6 +16,7 @@ using UnityEngine;
 using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using Il2CppAssets.Scripts.Models.Bloons.Behaviors;
+using BloonType = BTD_Mod_Helper.Api.Enums.BloonType;
 
 namespace BonnieHeroMod;
 

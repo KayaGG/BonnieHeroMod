@@ -27,7 +27,7 @@ using Il2CppAssets.Scripts.Unity.UI_New.InGame.StoreMenu;
 namespace BonnieHeroMod;
 
 [HarmonyPatch]
-public class BonnieHeroMod : BloonsTD6Mod
+public partial class BonnieHeroMod : BloonsTD6Mod
 {
     public override void OnTowerCreated(Tower tower, Entity target, Model modelToUse)
     {

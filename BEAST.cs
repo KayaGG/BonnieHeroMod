@@ -16,6 +16,7 @@ using Il2CppAssets.Scripts.Models.Towers.Weapons;
 using Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Behaviors;
 using UnityEngine;
 using Il2CppAssets.Scripts.Simulation.Towers;
+using BloonType = BTD_Mod_Helper.Api.Enums.BloonType;
 
 namespace BonnieHeroMod;
 

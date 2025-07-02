@@ -1,4 +1,7 @@
-﻿using BTD_Mod_Helper.Api;
+﻿using BTD_Mod_Helper;
+using BTD_Mod_Helper.Api;
+using BTD_Mod_Helper.Api.Hooks;
+using BTD_Mod_Helper.Api.Hooks.BloonHooks;
 using BTD_Mod_Helper.Extensions;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Models;
@@ -11,6 +14,7 @@ using Il2CppAssets.Scripts.Simulation.SMath;
 using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors;
 using Il2CppAssets.Scripts.Simulation.Towers.Behaviors.Abilities;
+using Il2CppAssets.Scripts.Simulation.Towers.Projectiles;
 using Il2CppAssets.Scripts.Simulation.Towers.Projectiles.Behaviors;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
@@ -80,52 +84,56 @@ public static class Patches
         return true;
     }
 
-    [HarmonyPatch(typeof(Bloon), nameof(Bloon.Degrade))]
-    [HarmonyPrefix]
-    private static void BloonDestroyPostfix(Bloon __instance)
+    internal partial class BonnieHeroMod
     {
-        if (__instance.bloonModel.baseId != BloonID<BloonstoneCart>()) return;
-
-        var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
-        if (bonnieHero == null || !bonnieHero.GetBonnieData(out var towerLogic))
+        [HookTarget(typeof(BloonDegradeHook), HookTargetAttribute.EHookType.Postfix)]
+        public static bool PostDegradeHook(Bloon __instance)
         {
-            return;
-        }
+            //ModHelper.Msg<BonnieHeroMod>("Running Postfix");
+            if (__instance.bloonModel.baseId != BloonID<BloonstoneCart>()) return true;
 
-        var cartWorth = 25f;
-
-        for (int i = 0; i < towerLogic.CurrentTier; i++)
-        {
-            switch (i)
+            var bonnieHero = InGame.instance.GetTowers().Find(tower => tower.towerModel.baseId == TowerID<BonnieHero>());
+            if (bonnieHero == null || !bonnieHero.GetBonnieData(out var towerLogic))
             {
-                case < 5:
-                    cartWorth += 15f;
-                    break;
-                case < 10:
-                    cartWorth += 40f;
-                    break;
-                case < 15:
-                    cartWorth += 100f;
-                    break;
-                case < 20:
-                    cartWorth += 160f;
-                    break;
-                case < 25:
-                    cartWorth += 280f;
-                    break;
-                case < 30:
-                    cartWorth += 400f;
-                    break;
-                case < 35:
-                    cartWorth += 600f;
-                    break;
-                case < 40:
-                    cartWorth += 800f;
-                    break;
+                return true;
             }
-        }
 
-        CreateCashProjectile(bonnieHero, __instance.Position, cartWorth);
+            var cartWorth = 25f;
+
+            for (int i = 0; i < towerLogic.CurrentTier; i++)
+            {
+                switch (i)
+                {
+                    case < 5:
+                        cartWorth += 15f;
+                        break;
+                    case < 10:
+                        cartWorth += 40f;
+                        break;
+                    case < 15:
+                        cartWorth += 100f;
+                        break;
+                    case < 20:
+                        cartWorth += 160f;
+                        break;
+                    case < 25:
+                        cartWorth += 280f;
+                        break;
+                    case < 30:
+                        cartWorth += 400f;
+                        break;
+                    case < 35:
+                        cartWorth += 600f;
+                        break;
+                    case < 40:
+                        cartWorth += 800f;
+                        break;
+                }
+            }
+
+            CreateCashProjectile(bonnieHero, __instance.Position, cartWorth);
+            return true;
+        }
     }
 
     [HarmonyPatch(typeof(Bloon), nameof(Bloon.OnSpawn))]
@@ -239,7 +247,7 @@ public static class Patches
 
                         cartExplosionProjectile.owner = InGame.instance.GetUnityToSimulation().MyPlayerNumber;
 
-                        bloon.Degrade(false, bonnieHero, false);
+                        bloon.Degrade(null, false, bonnieHero, false, new Il2CppSystem.Nullable<int>());
                     }
                 }
             }
